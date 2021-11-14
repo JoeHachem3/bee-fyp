@@ -1,0 +1,22 @@
+.map {
+  height: calc(100vh - 4rem);
+  margin-top: -2rem;
+}
+
+.hive-data {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2rem;
+  overflow-x: hidden;
+}
+
+.graph {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.date-picker {
+  margin-left: 62px;
+}

@@ -1,0 +1,195 @@
+@import './variables.css';
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* height: 100vh;
+  overflow: hidden; */
+  min-width: 300px;
+}
+
+#root {
+  /* height: 100vh;
+  overflow: hidden; */
+  background-color: var(--color-background);
+  transition: background-color 0.3s ease-in-out;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.main-container {
+  width: 100%;
+  min-height: calc(100vh - 4rem);
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  overflow: auto;
+  padding-top: 2rem;
+}
+
+.main-padding {
+  padding: 1rem 1rem 0;
+}
+
+.recharts-legend-item {
+  cursor: pointer;
+}
+
+.MuiDrawer-paper {
+  background-color: var(--color-background) !important;
+}
+
+.side-drawer .MuiDrawer-paper {
+  padding: 1rem;
+  min-width: 240px;
+}
+
+.bottom-drawer .MuiDrawer-paper {
+  min-width: 300px;
+  height: 100vh;
+}
+
+.MuiDialog-container > div {
+  background-color: var(--color-background) !important;
+}
+
+.rdrDateRangePickerWrapper > div,
+.rdrStaticRange,
+.rdrDateDisplayWrapper {
+  background-color: var(--color-background-110) !important;
+}
+
+.rdrDateDisplayWrapper span {
+  background-color: var(--color-background) !important;
+}
+
+.rdrDateDisplayItemActive {
+  border-color: var(--color-primary) !important;
+}
+
+.rdrDateDisplayItemActive input {
+  color: var(--color-primary) !important;
+}
+
+.light .rdrDateDisplayItemActive input {
+  color: var(--color-text) !important;
+}
+
+.rdrDateRangePickerWrapper * {
+  color: var(--color-text) !important;
+}
+
+.rdrStaticRange,
+.rdrDefinedRangesWrapper {
+  border-color: var(--color-background) !important;
+}
+
+.rdrStaticRange:hover .rdrStaticRangeLabel,
+.rdrStaticRange:focus .rdrStaticRangeLabel {
+  background-color: var(--color-background) !important;
+}
+
+.rdrStaticRangeSelected {
+  background-color: var(--color-background) !important;
+}
+
+.rdrStaticRangeSelected span {
+  color: var(--color-primary) !important;
+}
+
+.rdrInputRangeInput,
+.rdrNextPrevButton {
+  background-color: var(--color-background) !important;
+  border: none !important;
+}
+
+.rdrNextButton i {
+  border-left-color: var(--color-primary) !important;
+}
+
+.rdrPprevButton i {
+  border-right-color: var(--color-primary) !important;
+}
+
+.rdrSelected,
+.rdrInRange,
+.rdrStartEdge,
+.rdrEndEdge {
+  color: var(--color-primary) !important;
+}
+
+.rdrDayStartPreview,
+.rdrDayInPreview,
+.rdrDayEndPreview {
+  border-color: var(--color-primary) !important;
+}
+
+.rdrDayToday .rdrDayNumber span:after {
+  background-color: var(--color-primary) !important;
+}
+
+.rdrSelected + span span,
+.rdrInRange + span span,
+.rdrStartEdge + span span,
+.rdrEndEdge + span span,
+.rdrSelected + span + span span,
+.rdrInRange + span + span span,
+.rdrStartEdge + span + span span,
+.rdrEndEdge + span + span span {
+  color: var(--color-black) !important;
+}
+
+.rdrDayPassive {
+  opacity: 0.5;
+}
+
+.rdrMonthAndYearPickers {
+  justify-content: space-evenly !important;
+}
+
+.rdrMonthAndYearPickers select {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.rdrMonthAndYearPickers select option {
+  background: var(--color-background);
+}
+
+.rdrDefinedRangesWrapper {
+  display: none;
+}
+
+.responsive-date-picker .rdrCalendarWrapper,
+.rdrMonth,
+.rdrDateRangePickerWrapper {
+  max-width: 100% !important;
+}
+
+.recharts-brush rect:not(.recharts-brush-slide) {
+  fill: var(--color-background-90) !important;
+}
+
+.recharts-brush-slide {
+  fill: var(--color-text) !important;
+}
