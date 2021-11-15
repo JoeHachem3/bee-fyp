@@ -1,3 +1,4 @@
+import config from '../../config';
 import GoogleMapReact from 'google-map-react';
 import { useEffect, useState } from 'react';
 import BeeMarker from './BeeMarker';
@@ -12,7 +13,7 @@ const Map = (props: MapModel) => {
 
   return (
     <GoogleMapReact
-      bootstrapURLKeys={{ key: 'AIzaSyAOZtmn7y_dTzpUZhJxrur9ohLVbRwIB2Q' }}
+      bootstrapURLKeys={{ key: config.googleMaps.key }}
       defaultCenter={{
         lat: propState.center.latitude,
         lng: propState.center.longitude,

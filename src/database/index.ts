@@ -1,3 +1,4 @@
+import config from '../config';
 import { initializeApp } from 'firebase/app';
 import {
   getAuth,
@@ -15,15 +16,7 @@ import {
 } from 'firebase/firestore/lite';
 import * as models from './models';
 
-const firebaseConfig = {
-  apiKey: 'AIzaSyAOZtmn7y_dTzpUZhJxrur9ohLVbRwIB2Q',
-  authDomain: 'bee-fyp.firebaseapp.com',
-  projectId: 'bee-fyp',
-  storageBucket: 'bee-fyp.appspot.com',
-  messagingSenderId: '494538213306',
-  appId: '1:494538213306:web:80fa13c4f4c4ed8daf3f83',
-  measurementId: 'G-VEWC7H9HFD',
-};
+const firebaseConfig = config.firebase;
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
