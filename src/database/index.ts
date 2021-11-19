@@ -13,11 +13,12 @@ import {
   query,
   where,
   Query,
+  doc,
 } from 'firebase/firestore/lite';
+import { onSnapshot } from 'firebase/firestore';
 import * as models from './models';
 
 const firebaseConfig = config.firebase;
-
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
@@ -43,11 +44,12 @@ export async function register(credentials: {
   last_name: string;
 }) {
   try {
-    await createUserWithEmailAndPassword(
+    createUserWithEmailAndPassword(
       auth,
       credentials.email,
       credentials.password,
     );
+    createUser(credentials);
   } catch (error) {
     console.log(error);
     return error;
@@ -77,6 +79,10 @@ export async function createUser(user: models.FirebaseUserModel) {
 }
 
 // BeeHives
+// export function onBeeHivesChanged(callback) {
+//   return onSnapshot(doc(db, 'bee-hives'), callback);
+// }
+
 export async function getBeeHiveById(id: string) {
   const q = query(collection(db, 'bee-hives'), where('id', '==', id));
   const beeHivesSnapshot = await getDocs(q);

@@ -95,10 +95,7 @@ const Authentication = () => {
       setIsLoading(false);
       if (error.code.includes('user-not-found'))
         setErrorMessage('Incorrect Username or Password.');
-      else
-        setErrorMessage(
-          'Oops... Something Went Wrong. Please Try again Later.',
-        );
+      else setErrorMessage('Something Went Wrong. Please Try again Later.');
     }
   };
 

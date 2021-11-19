@@ -10,8 +10,13 @@ import Homepage from './pages/Homepage';
 import Authentication from './pages/Authentication';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppState } from './store/state';
-import { useCallback, useEffect } from 'react';
-import { auth, getBeeHivesByOwnerEmail, getUserByEmail } from './database';
+import { useCallback, useEffect, useState } from 'react';
+import {
+  auth,
+  getBeeHivesByOwnerEmail,
+  getUserByEmail,
+  // onBeeHivesChanged,
+} from './database';
 import * as userActions from './store/user/actions';
 import { BeeHiveModel, UserModel } from './database/models';
 import BeeBlack from './images/bee-black.svg';
@@ -47,6 +52,9 @@ const App = () => {
         )) as BeeHiveModel[];
         user.bee_hives = beeHives;
         storeLogin(user, userCredentials.stsTokenManager.expirationTime);
+        // onBeeHivesChanged((doc) => {
+        //   console.log('here', doc.data());
+        // });
       }
     });
   }, []);
