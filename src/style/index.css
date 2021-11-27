@@ -71,6 +71,11 @@ p {
   color: var(--color-text);
 }
 
+.Mui-selected,
+.Mui-selected * {
+  color: var(--color-primary) !important;
+}
+
 .bottom-drawer .MuiDrawer-paper {
   min-width: 300px;
   height: 100vh;

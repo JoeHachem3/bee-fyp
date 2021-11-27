@@ -1,10 +1,10 @@
 .speed-dial-action {
-  background-color: var(--color-background-110);
-  color: var(--color-text);
+  background-color: var(--color-background-110) !important;
+  color: var(--color-text) !important;
 }
 .speed-dial-action:hover {
-  background-color: var(--color-background-110);
-  color: var(--color-primary);
+  background-color: var(--color-background-110) !important;
+  color: var(--color-primary) !important;
 }
 
 .employees {
