@@ -34,14 +34,19 @@ const Header = (props: { title?: string; logo?: string }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
 
   const handleSideMenuChanges = (newRoute: string): void => {
-    if (!newRoute) return;
+    if (typeof newRoute !== 'string') return;
     setRoute(newRoute);
     setIsDrawerOpen(false);
     history.push(`/${newRoute}`);
   };
 
   return (
-    <Toolbar logo={props.logo} title={props.title} minHeight='4rem'>
+    <Toolbar
+      logo={props.logo}
+      title={props.title}
+      onLogoClick={() => handleSideMenuChanges('')}
+      minHeight='4rem'
+    >
       <>
         {theme === 'dark' ? (
           <IconButton onClick={() => setTheme('light')}>
