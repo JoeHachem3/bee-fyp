@@ -6,17 +6,19 @@ import {
   createUserWithEmailAndPassword,
 } from 'firebase/auth';
 import {
+  onSnapshot,
   getFirestore,
-  collection,
   getDocs,
   addDoc,
   query,
   where,
   Query,
-  doc,
-} from 'firebase/firestore/lite';
-import { onSnapshot } from 'firebase/firestore';
+  collection,
+} from 'firebase/firestore';
 import * as models from './models';
+import store from '../store';
+import * as userActions from '../store/user/actions';
+import { GeoPoint } from 'firebase/firestore/lite';
 
 const firebaseConfig = config.firebase;
 const app = initializeApp(firebaseConfig);
@@ -33,23 +35,37 @@ export async function login(credentials: { email: string; password: string }) {
       credentials.password,
     );
   } catch (error) {
-    return error;
+    const user = await getUserByEmail(credentials.email);
+    console.log(user);
+    if (user) {
+      try {
+        createUserWithEmailAndPassword(
+          auth,
+          credentials.email,
+          credentials.password,
+        );
+      } catch (error) {
+        return error;
+      }
+    } else return error;
   }
 }
 
-export async function register(credentials: {
-  email: string;
-  password: string;
-  first_name: string;
-  last_name: string;
-}) {
+export async function register(
+  credentials: models.FirebaseUserModel & { password: string },
+) {
   try {
-    createUserWithEmailAndPassword(
-      auth,
-      credentials.email,
-      credentials.password,
-    );
-    createUser(credentials);
+    const user = { ...credentials };
+    delete user.password;
+    await createUser(user);
+    console.log(store.getState().userReducer.user);
+    if (!store.getState().userReducer.user) {
+      createUserWithEmailAndPassword(
+        auth,
+        credentials.email,
+        credentials.password,
+      );
+    }
   } catch (error) {
     console.log(error);
     return error;
@@ -70,6 +86,9 @@ export async function getUserByEmail(email: string) {
 
 export async function createUser(user: models.FirebaseUserModel) {
   try {
+    Object.keys(user).forEach((key) => {
+      if (user[key] === undefined) delete user[key];
+    });
     const docRef = await addDoc(collection(db, 'users'), user);
     console.log('Document written with ID: ', docRef.id);
     return new models.FirebaseUserModel(user);
@@ -78,10 +97,28 @@ export async function createUser(user: models.FirebaseUserModel) {
   }
 }
 
+// Employees
+export function onEmployeesChanged(workingFor: string) {
+  const q = query(collection(db, 'users'), where('worksFor', '==', workingFor));
+  onSnapshot(q, (querySnapshot) => {
+    const employees = [];
+    querySnapshot.forEach((doc) => employees.push(doc.data()));
+    store.dispatch(userActions.setEmployees(employees));
+  });
+}
+
 // BeeHives
-// export function onBeeHivesChanged(callback) {
-//   return onSnapshot(doc(db, 'bee-hives'), callback);
-// }
+export function onBeeHivesChanged(ownerEmail: string) {
+  const q = query(
+    collection(db, 'bee-hives'),
+    where('owner', '==', ownerEmail),
+  );
+  onSnapshot(q, (querySnapshot) => {
+    const beeHives = [];
+    querySnapshot.forEach((doc) => beeHives.push(doc.data()));
+    store.dispatch(userActions.setBeeHives(beeHives));
+  });
+}
 
 export async function getBeeHiveById(id: string) {
   const q = query(collection(db, 'bee-hives'), where('id', '==', id));
@@ -124,7 +161,18 @@ export async function setBeeHive(beeHive: models.BeeHiveModel) {
   }
 }
 
+// console.log(
+//   Math.floor(Math.random() * 180 - 90),
+//   Math.floor(Math.random() * 360 - 180),
+// );
+
 // setBeeHive({
+//   location: new GeoPoint(
+//     Math.floor(Math.random() * 180 - 90),
+//     Math.floor(Math.random() * 360 - 180),
+//   ),
+//   name: 'Name' + Math.random() * 10,
+//   owner: 'emp1@gmail.com',
 //   data: [
 //     {
 //       timestamp: '10/24/2021 0:00',

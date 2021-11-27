@@ -12,19 +12,15 @@ import {
 } from 'recharts';
 
 import classes from './graph.module.css';
-import { useEffect, useState } from 'react';
 
 const Graph = (props: GraphModel) => {
-  const [propState, setPropState] = useState<GraphModel>(new GraphModel({}));
+  props = new GraphModel(props);
 
-  useEffect(() => {
-    setPropState(new GraphModel(props));
-  }, [props]);
   const toggleVisibility = (dataKey: string) => {
-    const lines = propState.lines.slice();
+    const lines = props.lines.slice();
     const line = lines.find((line) => line.key === dataKey);
     line.hide = !line.hide;
-    setPropState({ ...propState, lines });
+    props = { ...props, lines };
   };
 
   return (
@@ -33,15 +29,15 @@ const Graph = (props: GraphModel) => {
         <LineChart
           width={500}
           height={500}
-          data={[...propState.data]}
+          data={[...props.data]}
           margin={{ right: 32 }}
         >
           <CartesianGrid strokeDasharray='3 3' />
-          <XAxis dataKey={propState.xAxis} />
+          <XAxis dataKey={props.xAxis} />
           <YAxis />
           <Tooltip />
           <Legend onClick={(e) => toggleVisibility(e.dataKey)} />
-          {propState.lines.map((line) => (
+          {props.lines.map((line) => (
             <Line
               key={line.key}
               type='monotone'
@@ -50,10 +46,7 @@ const Graph = (props: GraphModel) => {
               hide={line.hide}
             />
           ))}
-          <Brush
-            startIndex={propState.startIndex}
-            endIndex={propState.endIndex}
-          />
+          <Brush startIndex={props.startIndex} endIndex={props.endIndex} />
         </LineChart>
       </ResponsiveContainer>
     </div>

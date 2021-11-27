@@ -8,17 +8,13 @@ import { ThemeProvider } from '@mui/material';
 
 import Homepage from './pages/Homepage';
 import Authentication from './pages/Authentication';
+import Employees from './pages/Employees';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppState } from './store/state';
-import { useCallback, useEffect, useState } from 'react';
-import {
-  auth,
-  getBeeHivesByOwnerEmail,
-  getUserByEmail,
-  // onBeeHivesChanged,
-} from './database';
+import { useCallback, useEffect } from 'react';
+import { auth, getUserByEmail } from './database';
 import * as userActions from './store/user/actions';
-import { BeeHiveModel, UserModel } from './database/models';
+import { UserModel } from './database/models';
 import BeeBlack from './images/bee-black.svg';
 
 const App = () => {
@@ -47,14 +43,7 @@ const App = () => {
         storeLogout();
       } else {
         const user = (await getUserByEmail(userCredentials.email)) as UserModel;
-        const beeHives = (await getBeeHivesByOwnerEmail(
-          userCredentials.email,
-        )) as BeeHiveModel[];
-        user.bee_hives = beeHives;
         storeLogin(user, userCredentials.stsTokenManager.expirationTime);
-        // onBeeHivesChanged((doc) => {
-        //   console.log('here', doc.data());
-        // });
       }
     });
   }, []);
@@ -81,6 +70,11 @@ const App = () => {
                 exact
                 path='/'
                 component={user ? Homepage : Authentication}
+              />
+              <Route
+                exact
+                path='/employees'
+                component={user ? Employees : Authentication}
               />
               <Redirect to='/' />
             </Switch>

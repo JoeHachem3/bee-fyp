@@ -1,15 +1,25 @@
 import { useCallback, useState } from 'react';
-import { Button } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppState } from '../../store/state';
 import { logout } from '../../database';
-import { IconButton, Chip, SwipeableDrawer } from '@mui/material';
-import { LightMode, DarkMode } from '@mui/icons-material';
+import {
+  Button,
+  IconButton,
+  Chip,
+  ToggleButtonGroup,
+  ToggleButton,
+} from '@mui/material';
+import { LightMode, DarkMode, Settings, People } from '@mui/icons-material';
 import Toolbar from '../Toolbar';
 import * as preferenceActions from '../../store/preferences/actions';
+import Sidebar from '../Sidebar';
+import BeeGold from '../../images/bee-gold.svg';
+import classes from './header.module.css';
+import { useHistory } from 'react-router-dom';
 
 const Header = (props: { title?: string; logo?: string }) => {
   const dispatch = useDispatch();
+  const history = useHistory();
   const user = useSelector((state: AppState) => state.userReducer.user);
 
   const theme = useSelector((state: AppState) => state.preferenceReducer.theme);
@@ -19,7 +29,16 @@ const Header = (props: { title?: string; logo?: string }) => {
     [dispatch],
   );
 
+  const [route, setRoute] = useState<string>();
+
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+
+  const handleSideMenuChanges = (newRoute: string): void => {
+    if (!newRoute) return;
+    setRoute(newRoute);
+    setIsDrawerOpen(false);
+    history.push(`/${newRoute}`);
+  };
 
   return (
     <Toolbar logo={props.logo} title={props.title} minHeight='4rem'>
@@ -33,25 +52,67 @@ const Header = (props: { title?: string; logo?: string }) => {
             <DarkMode />
           </IconButton>
         )}
+
         {user && (
-          <>
-            <Chip
-              label={`${user.first_name} ${user.last_name}`}
-              onClick={() => setIsDrawerOpen(true)}
-            />
-            <SwipeableDrawer
-              anchor='right'
-              className='side-drawer'
-              open={isDrawerOpen}
-              onClose={() => setIsDrawerOpen(false)}
-              onOpen={() => setIsDrawerOpen(true)}
-            >
-              <Button variant='text' color='warning' onClick={logout}>
-                Logout
-              </Button>
-            </SwipeableDrawer>
-          </>
+          <IconButton onClick={() => setIsDrawerOpen(true)}>
+            <Settings />
+          </IconButton>
         )}
+        <>
+          <Sidebar
+            anchor='right'
+            open={isDrawerOpen}
+            onClose={() => setIsDrawerOpen(false)}
+            onOpen={() => setIsDrawerOpen(true)}
+          >
+            <>
+              <div className={classes['sidebar-content']}>
+                <div className={classes['logo-container']}>
+                  <img src={BeeGold} alt='' width='40px' />
+                </div>
+                {user && (
+                  <>
+                    <Chip label={`${user.firstName} ${user.lastName}`} />
+                    <ToggleButtonGroup
+                      sx={{ flexDirection: 'column', gap: '1rem' }}
+                      value={route}
+                      exclusive
+                      onChange={(e, newRoute) =>
+                        handleSideMenuChanges(newRoute)
+                      }
+                    >
+                      <ToggleButton
+                        value='employees'
+                        aria-label='employees'
+                        sx={{
+                          justifyContent: 'flex-start',
+                          width: '100%',
+                          gap: '1rem',
+                          textTransform: 'none',
+                        }}
+                        onClick={() => setIsDrawerOpen(true)}
+                      >
+                        <People /> Employees
+                      </ToggleButton>
+                    </ToggleButtonGroup>
+                  </>
+                )}
+              </div>
+              {user && (
+                <Button
+                  variant='text'
+                  color='warning'
+                  onClick={() => {
+                    logout();
+                    setIsDrawerOpen(false);
+                  }}
+                >
+                  Logout
+                </Button>
+              )}
+            </>
+          </Sidebar>
+        </>
       </>
     </Toolbar>
   );

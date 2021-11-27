@@ -1,31 +1,35 @@
 import { GeoPoint } from 'firebase/firestore/lite';
 import { v4 as uuidv4 } from 'uuid';
 
+export type Optional<Type> = {
+  [Property in keyof Type]+?: Type[Property];
+};
+
 export class FirebaseUserModel {
   email: string;
-  first_name: string;
-  last_name: string;
-  is_admin?: boolean;
-  employees?: string[];
+  firstName: string;
+  lastName: string;
+  role?: UserRole;
+  worksFor?: string;
 
   constructor(props: FirebaseUserModel) {
     return {
       email: props.email,
-      first_name: props.first_name,
-      last_name: props.last_name,
-      is_admin: !!props.is_admin,
-      employees: props.employees || [],
+      firstName: props.firstName,
+      lastName: props.lastName,
+      role: props.role || 'employee',
+      worksFor: props.worksFor,
     };
   }
 }
 
 export interface UserModel {
   email: string;
-  first_name: string;
-  last_name: string;
-  is_admin: boolean;
+  firstName: string;
+  lastName: string;
+  role: UserRole;
   employees: UserModel[];
-  bee_hives: BeeHiveModel[];
+  beeHives: BeeHiveModel[];
 }
 
 export class BeeHiveModel {
@@ -53,3 +57,5 @@ export interface BeeHiveDataModel {
   temperature: number;
   timestamp: string;
 }
+
+export type UserRole = 'employee' | 'owner' | 'admin';

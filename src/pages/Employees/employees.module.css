@@ -1,0 +1,16 @@
+.speed-dial-action {
+  background-color: var(--color-background-110);
+  color: var(--color-text);
+}
+.speed-dial-action:hover {
+  background-color: var(--color-background-110);
+  color: var(--color-primary);
+}
+
+.employees {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  padding: 1rem;
+  gap: 1rem;
+}

@@ -1,5 +1,5 @@
 export const initialRegisterForm = {
-  first_name: {
+  firstName: {
     type: 'text',
     label: 'First Name',
     placeholder: 'Frodo',
@@ -7,7 +7,7 @@ export const initialRegisterForm = {
     valid: false,
     touched: false,
   },
-  last_name: {
+  lastName: {
     type: 'text',
     label: 'Last Name',
     placeholder: 'Baggins',

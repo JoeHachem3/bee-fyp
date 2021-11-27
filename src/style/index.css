@@ -62,6 +62,13 @@ p {
 .side-drawer .MuiDrawer-paper {
   padding: 1rem;
   min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.side-drawer .MuiDrawer-paper * {
+  color: var(--color-text);
 }
 
 .bottom-drawer .MuiDrawer-paper {
