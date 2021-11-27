@@ -12,14 +12,18 @@ import {
 } from 'recharts';
 
 import classes from './graph.module.css';
+import { useState } from 'react';
 
 const Graph = (props: GraphModel) => {
   props = new GraphModel(props);
+  const [lines, setLines] = useState<typeof props.lines>(props.lines);
 
   const toggleVisibility = (dataKey: string) => {
-    const lines = props.lines.slice();
-    const line = lines.find((line) => line.key === dataKey);
+    console.log(dataKey);
+    const tmpLines = lines.slice();
+    const line = tmpLines.find((line) => line.key === dataKey);
     line.hide = !line.hide;
+    setLines(tmpLines);
     props = { ...props, lines };
   };
 
