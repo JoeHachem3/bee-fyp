@@ -1,7 +1,13 @@
 import classes from './employees.module.css';
 import SpeedDial from '../../components/SpeedDial';
 import { Person, Place } from '@mui/icons-material';
-import { SpeedDialAction, Dialog, Card, CardContent } from '@mui/material';
+import {
+  SpeedDialAction,
+  Dialog,
+  Card,
+  CardContent,
+  Typography,
+} from '@mui/material';
 import { useState } from 'react';
 import AuthenticationCard from '../../components/AuthenticationCard';
 import { DragDropContext } from 'react-beautiful-dnd';
@@ -35,7 +41,11 @@ const Employees = () => {
           key={employee.email}
           sx={{ backgroundColor: 'var(--color-background-110)' }}
         >
-          <CardContent>{`${employee.firstName} ${employee.lastName}`}</CardContent>
+          <CardContent>
+            <Typography
+              sx={{ color: 'var(--color-text)' }}
+            >{`${employee.firstName} ${employee.lastName}`}</Typography>
+          </CardContent>
         </Card>
       ))}
       {/* <DragDropContext
