@@ -77,22 +77,25 @@ const Homepage = () => {
   };
 
   const center = { lng: 0, lat: 0 };
-  if (user?.beeHives?.length) {
-    user.beeHives.forEach((hive) => {
-      center.lng += hive.location.longitude;
-      center.lat += hive.location.latitude;
-    });
-    center.lng /= user.beeHives.length;
-    center.lat /= user.beeHives.length;
+  if (user?.beeHives) {
+    const beeHives = Object.entries(user.beeHives || {});
+    if (beeHives.length) {
+      beeHives.forEach(([key, hive]) => {
+        center.lng += hive.location.longitude;
+        center.lat += hive.location.latitude;
+      });
+      center.lng /= beeHives.length;
+      center.lat /= beeHives.length;
+    }
   }
-  console.log(user?.beeHives);
+
   return (
     <>
       <div className={classes.map}>
         <Map
           center={new GeoPoint(center.lat, center.lng)}
           zoom={3}
-          markers={user?.beeHives?.map((hive) => {
+          markers={Object.entries(user?.beeHives || {})?.map(([key, hive]) => {
             return {
               location: hive.location,
               description: hive.description,

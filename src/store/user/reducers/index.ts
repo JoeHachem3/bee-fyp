@@ -11,8 +11,10 @@ import { UserState } from '../state';
 const initialState: UserState = {};
 
 const login = (state: UserState, action: loginAction): UserState => {
-  onBeeHivesChanged(action.user.email);
-  onEmployeesChanged(action.user.email);
+  if (action.user.role === 'owner') {
+    onEmployeesChanged(action.user.email);
+    onBeeHivesChanged(action.user.email);
+  }
   return {
     ...state,
     user: action.user,

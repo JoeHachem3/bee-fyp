@@ -1,40 +1,57 @@
-import React from 'react';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import DragAndDropListModel from './drag-and-drop-list-model';
+import { Card, CardContent, Typography } from '@mui/material';
 
 const DragAndDropList = (props: DragAndDropListModel) => {
   return (
     <Droppable
       droppableId={props.listId}
       type={props.listType}
-      direction='horizontal'
+      direction={props.direction || 'vertical'}
       isCombineEnabled={false}
     >
       {(dropProvided) => (
-        <div {...dropProvided.droppableProps}>
-          <div>
-            <div>
-              <div style={{ display: 'flex' }} ref={dropProvided.innerRef}>
-                {props.beeHives?.map((beeHive, index) => (
+        <div {...dropProvided.droppableProps} style={{ height: '100%' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection:
+                props.direction === 'horizontal' ? 'row' : 'column',
+              height: '100%',
+              flexWrap: 'wrap',
+            }}
+            ref={dropProvided.innerRef}
+          >
+            {props.beeHives?.map(
+              (beeHive, index) =>
+                beeHive && (
                   <Draggable
                     key={beeHive.id}
                     draggableId={beeHive.id}
                     index={index}
                   >
                     {(dragProvided) => (
-                      <div
+                      <Card
                         {...dragProvided.dragHandleProps}
                         {...dragProvided.draggableProps}
                         ref={dragProvided.innerRef}
+                        sx={{
+                          backgroundColor: 'var(--color-background)',
+                          margin: '0.25rem',
+                          height: 'min-content',
+                        }}
                       >
-                        {beeHive.name}
-                      </div>
+                        <CardContent sx={{ padding: '0.5rem !important' }}>
+                          <Typography sx={{ color: 'var(--color-text)' }}>
+                            {beeHive.name}
+                          </Typography>
+                        </CardContent>
+                      </Card>
                     )}
                   </Draggable>
-                ))}
-                {dropProvided.placeholder}
-              </div>
-            </div>
+                ),
+            )}
+            {dropProvided.placeholder}
           </div>
         </div>
       )}

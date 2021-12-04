@@ -66,16 +66,19 @@ const App = () => {
           <Header logo={BeeBlack} title='Bee FYP'></Header>
           <div className={'main-container'}>
             <Switch>
-              <Route
-                exact
-                path='/'
-                component={user ? Homepage : Authentication}
-              />
-              <Route
-                exact
-                path='/employees'
-                component={user ? Employees : Authentication}
-              />
+              {user ? (
+                <>
+                  <Route exact path='/' component={Homepage} />
+                  {user.role === 'owner' && (
+                    <Route exact path='/employees' component={Employees} />
+                  )}
+                </>
+              ) : (
+                <>
+                  <Route exact path='/' component={Authentication} />
+                  <Route exact path='/employees' component={Authentication} />
+                </>
+              )}
               <Redirect to='/' />
             </Switch>
           </div>

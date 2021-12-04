@@ -5,10 +5,6 @@ import MapModel from './map.model';
 
 const Map = (props: MapModel) => {
   props = new MapModel(props);
-  console.log({
-    lat: props.center.latitude,
-    lng: props.center.longitude,
-  });
 
   return (
     <>

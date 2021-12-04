@@ -19,7 +19,6 @@ const Graph = (props: GraphModel) => {
   const [lines, setLines] = useState<typeof props.lines>(props.lines);
 
   const toggleVisibility = (dataKey: string) => {
-    console.log(dataKey);
     const tmpLines = lines.slice();
     const line = tmpLines.find((line) => line.key === dataKey);
     line.hide = !line.hide;

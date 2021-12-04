@@ -9,13 +9,19 @@ import {
   ToggleButtonGroup,
   ToggleButton,
 } from '@mui/material';
-import { LightMode, DarkMode, Settings, People } from '@mui/icons-material';
+import {
+  LightMode,
+  DarkMode,
+  Settings,
+  People,
+  Home,
+} from '@mui/icons-material';
 import Toolbar from '../Toolbar';
 import * as preferenceActions from '../../store/preferences/actions';
 import Sidebar from '../Sidebar';
 import BeeGold from '../../images/bee-gold.svg';
 import classes from './header.module.css';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 
 const Header = (props: { title?: string; logo?: string }) => {
   const dispatch = useDispatch();
@@ -29,7 +35,9 @@ const Header = (props: { title?: string; logo?: string }) => {
     [dispatch],
   );
 
-  const [route, setRoute] = useState<string>();
+  const [route, setRoute] = useState<string>(
+    useLocation().pathname.split('/')[1],
+  );
 
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
 
@@ -87,8 +95,8 @@ const Header = (props: { title?: string; logo?: string }) => {
                       }
                     >
                       <ToggleButton
-                        value='employees'
-                        aria-label='employees'
+                        value=''
+                        aria-label='homepage'
                         sx={{
                           justifyContent: 'flex-start',
                           width: '100%',
@@ -97,8 +105,23 @@ const Header = (props: { title?: string; logo?: string }) => {
                         }}
                         onClick={() => setIsDrawerOpen(true)}
                       >
-                        <People /> Employees
+                        <Home /> Homepage
                       </ToggleButton>
+                      {user?.role === 'owner' && (
+                        <ToggleButton
+                          value='employees'
+                          aria-label='employees'
+                          sx={{
+                            justifyContent: 'flex-start',
+                            width: '100%',
+                            gap: '1rem',
+                            textTransform: 'none',
+                          }}
+                          onClick={() => setIsDrawerOpen(true)}
+                        >
+                          <People /> Employees
+                        </ToggleButton>
+                      )}
                     </ToggleButtonGroup>
                   </>
                 )}

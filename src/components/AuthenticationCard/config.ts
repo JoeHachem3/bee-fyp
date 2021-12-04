@@ -23,14 +23,14 @@ export const initialRegisterForm = {
     valid: false,
     touched: false,
   },
-  password: {
-    type: 'password',
-    label: 'Password',
-    placeholder: '••••••••',
-    value: '',
-    valid: false,
-    touched: false,
-  },
+  // password: {
+  //   type: 'password',
+  //   label: 'Password',
+  //   placeholder: '••••••••',
+  //   value: '',
+  //   valid: false,
+  //   touched: false,
+  // },
 };
 
 export const initialLoginForm = {

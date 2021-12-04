@@ -1,4 +1,8 @@
-import { BeeHiveModel, UserModel } from '../../../database/models';
+import {
+  BeeHiveModel,
+  EmployeeModel,
+  UserModel,
+} from '../../../database/models';
 import * as types from './types';
 
 export interface loginAction {
@@ -13,12 +17,12 @@ export interface logoutAction {
 
 export interface setBeeHivesAction {
   type: string;
-  beeHives: BeeHiveModel[];
+  beeHives: { [key: string]: BeeHiveModel };
 }
 
 export interface setEmployeesAction {
   type: string;
-  employees: UserModel[];
+  employees: { [key: string]: EmployeeModel };
 }
 
 export const login = (user: UserModel, expirationTime: number): loginAction => {
@@ -35,14 +39,18 @@ export const logout = (): logoutAction => {
   };
 };
 
-export const setBeeHives = (beeHives: BeeHiveModel[]): setBeeHivesAction => {
+export const setBeeHives = (beeHives: {
+  [key: string]: BeeHiveModel;
+}): setBeeHivesAction => {
   return {
     type: types.SET_BEE_HIVES,
     beeHives,
   };
 };
 
-export const setEmployees = (employees: UserModel[]): setEmployeesAction => {
+export const setEmployees = (employees: {
+  [key: string]: EmployeeModel;
+}): setEmployeesAction => {
   return {
     type: types.SET_EMPLOYEES,
     employees,

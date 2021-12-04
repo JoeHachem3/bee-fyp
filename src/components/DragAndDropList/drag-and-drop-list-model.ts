@@ -6,6 +6,7 @@ interface DragAndDropListModel {
   internalScroll?: boolean;
   isCombineEnabled?: boolean;
   beeHives?: BeeHiveModel[];
+  direction?: 'vertical' | 'horizontal';
 }
 
 export default DragAndDropListModel;

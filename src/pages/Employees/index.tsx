@@ -6,20 +6,41 @@ import {
   Dialog,
   Card,
   CardContent,
-  Typography,
+  Chip,
 } from '@mui/material';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import AuthenticationCard from '../../components/AuthenticationCard';
 import { DragDropContext } from 'react-beautiful-dnd';
 import DragAndDropList from '../../components/DragAndDropList';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { AppState } from '../../store/state';
+import { BeeHiveModel, EmployeeModel } from '../../database/models';
+import * as userActions from '../../store/user/actions';
+import { updateEmployee } from '../../database';
 
 const Employees = () => {
+  const dispatch = useDispatch();
+
   const user = useSelector((state: AppState) => state.userReducer.user);
+
+  const setEmployees = useCallback(
+    (employees: { [key: string]: EmployeeModel }) =>
+      dispatch(userActions.setEmployees(employees)),
+    [dispatch],
+  );
 
   const [isAuthenticationCardOpen, setIsAuthenticationCardOpen] =
     useState<boolean>(false);
+  const [isBeeHiveCardOpen, setIsBeeHiveCardOpen] = useState<boolean>(false);
+
+  const [beeHivesArray, setBeeHivesArray] = useState<BeeHiveModel[]>([]);
+
+  useEffect(() => {
+    const beeHives = Object.entries(user?.beeHives || {}).map(
+      ([key, beeHive]) => beeHive,
+    );
+    setBeeHivesArray(beeHives);
+  }, [user]);
 
   const actions = [
     {
@@ -30,43 +51,159 @@ const Employees = () => {
     {
       icon: <Place />,
       name: 'Add Bee Hive',
-      onClick: () => setIsAuthenticationCardOpen(true),
+      onClick: () => setIsBeeHiveCardOpen(true),
     },
   ];
-  console.log(user.employees);
+
+  const onDragEnd = ({
+    destination,
+    source,
+  }: {
+    destination: { droppableId: string; index: number };
+    source: { droppableId: string; index: number };
+  }) => {
+    if (
+      !destination ||
+      (source.droppableId === user.email &&
+        destination.droppableId === user.email)
+    )
+      return;
+    else if (source.droppableId === user.email) {
+      const employee = JSON.parse(
+        JSON.stringify(user.employees[destination.droppableId]),
+      ) as EmployeeModel;
+      const currentBeeHive = beeHivesArray[source.index].id;
+
+      if (!currentBeeHive) return;
+
+      const worksIn = [];
+      employee.worksIn.forEach((beeHive, index) => {
+        if (index === destination.index) {
+          worksIn.includes(currentBeeHive) || worksIn.push(currentBeeHive);
+        }
+        worksIn.includes(beeHive) || worksIn.push(beeHive);
+      });
+      if (employee.worksIn.length <= destination.index)
+        worksIn.includes(currentBeeHive) || worksIn.push(currentBeeHive);
+
+      employee.worksIn = worksIn;
+
+      updateEmployee(employee.ref, { worksIn });
+      setEmployees({ ...user.employees, [employee.email]: employee });
+    } else if (destination.droppableId === user.email) {
+      const employee = JSON.parse(
+        JSON.stringify(user.employees[source.droppableId]),
+      ) as EmployeeModel;
+
+      const worksIn = employee.worksIn.filter(
+        (beeHive, index) => index !== source.index,
+      );
+
+      employee.worksIn = worksIn;
+
+      updateEmployee(employee.ref, { worksIn });
+      setEmployees({ ...user.employees, [employee.email]: employee });
+    } else {
+      const employees = JSON.parse(JSON.stringify(user.employees)) as {
+        [key: string]: EmployeeModel;
+      };
+      const sourceEmployee = employees[source.droppableId];
+      const destinationEmployee = employees[destination.droppableId];
+      const currentBeeHive = sourceEmployee.worksIn[source.index];
+      sourceEmployee.worksIn = employees[source.droppableId].worksIn.filter(
+        (beeHive) => beeHive !== currentBeeHive,
+      );
+
+      const destinationBeeHives = [];
+      destinationEmployee.worksIn.forEach((beeHive, index) => {
+        if (index === destination.index) {
+          destinationBeeHives.includes(currentBeeHive) ||
+            destinationBeeHives.push(currentBeeHive);
+        }
+        destinationBeeHives.includes(beeHive) ||
+          destinationBeeHives.push(beeHive);
+      });
+
+      if (destinationEmployee.worksIn.length <= destination.index)
+        destinationBeeHives.includes(currentBeeHive) ||
+          destinationBeeHives.push(currentBeeHive);
+
+      destinationEmployee.worksIn = destinationBeeHives;
+      updateEmployee(sourceEmployee.ref, { worksIn: sourceEmployee.worksIn });
+      updateEmployee(destinationEmployee.ref, {
+        worksIn: destinationEmployee.worksIn,
+      });
+      setEmployees(employees);
+    }
+  };
+
   return (
     <div className={classes.employees}>
-      {user.employees?.map((employee) => (
-        <Card
-          key={employee.email}
-          sx={{ backgroundColor: 'var(--color-background-110)' }}
-        >
-          <CardContent>
-            <Typography
-              sx={{ color: 'var(--color-text)' }}
-            >{`${employee.firstName} ${employee.lastName}`}</Typography>
-          </CardContent>
-        </Card>
-      ))}
-      {/* <DragDropContext
-        onDragEnd={({ destination, source }) => {
-          if (!destination) {
-            return;
+      {user?.beeHives && (
+        <DragDropContext
+          onDragEnd={({ destination, source }) =>
+            onDragEnd({ destination, source })
           }
-        }}
-      >
-        <div>
-          {user.employees?.map((employee) => (
-            <DragAndDropList
-              internalScroll
-              key={employee.email}
-              listId={employee.email}
-              listType='CARD'
-              beeHives={employee.beeHives}
-            />
-          ))}
-        </div>
-      </DragDropContext> */}
+        >
+          <div className={classes.owner}>
+            <Card
+              sx={{
+                backgroundColor: 'var(--color-background-110)',
+              }}
+            >
+              <CardContent
+                sx={{
+                  height: '100%',
+                }}
+              >
+                <Chip
+                  sx={{ color: 'var(--color-text)' }}
+                  label={`${user.firstName} ${user.lastName}`}
+                />
+                <DragAndDropList
+                  direction='horizontal'
+                  internalScroll
+                  listId={user.email}
+                  beeHives={beeHivesArray.filter(
+                    (beeHive) =>
+                      !Object.entries(user.employees).find(([key, employee]) =>
+                        employee.worksIn.includes(beeHive.id),
+                      ),
+                  )}
+                />
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className={classes.employeesList}>
+            {Object.entries(user.employees || {})?.map(([key, employee]) => (
+              <Card
+                key={key}
+                sx={{
+                  backgroundColor: 'var(--color-background-110)',
+                }}
+              >
+                <CardContent
+                  sx={{
+                    height: '100%',
+                  }}
+                >
+                  <Chip
+                    sx={{ color: 'var(--color-text)' }}
+                    label={`${employee.firstName} ${employee.lastName}`}
+                  />
+                  <DragAndDropList
+                    internalScroll
+                    key={key}
+                    listId={key}
+                    beeHives={employee.worksIn.map((id) => user.beeHives[id])}
+                  />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </DragDropContext>
+      )}
 
       <Dialog
         open={isAuthenticationCardOpen}

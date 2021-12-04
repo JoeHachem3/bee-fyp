@@ -11,6 +11,7 @@ export class FirebaseUserModel {
   lastName: string;
   role?: UserRole;
   worksFor?: string;
+  worksIn?: string[];
 
   constructor(props: FirebaseUserModel) {
     return {
@@ -19,20 +20,44 @@ export class FirebaseUserModel {
       lastName: props.lastName,
       role: props.role || 'employee',
       worksFor: props.worksFor,
+      worksIn: props.worksIn,
     };
   }
 }
 
 export interface UserModel {
+  ref: string;
   email: string;
   firstName: string;
   lastName: string;
   role: UserRole;
-  employees: UserModel[];
-  beeHives: BeeHiveModel[];
+  employees: { [key: string]: EmployeeModel };
+  beeHives: { [key: string]: BeeHiveModel };
 }
 
-export class BeeHiveModel {
+export class EmployeeModel {
+  ref: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: UserRole;
+  worksIn: string[];
+  worksFor: string;
+
+  constructor(props: EmployeeModel) {
+    return {
+      ref: props.ref,
+      email: props.email,
+      firstName: props.firstName || '',
+      lastName: props.lastName || '',
+      role: 'employee',
+      worksIn: props.worksIn || [],
+      worksFor: props.worksFor || '',
+    };
+  }
+}
+
+export class FirebaseBeeHiveModel {
   id?: string;
   owner: string;
   name: string;
@@ -40,16 +65,26 @@ export class BeeHiveModel {
   data: BeeHiveDataModel[];
   description?: string;
 
-  constructor(props: BeeHiveModel) {
+  constructor(props: FirebaseBeeHiveModel) {
     return {
       id: uuidv4(),
       owner: props.owner,
       name: props.name,
       location: props.location,
       data: props.data,
-      description: props.description,
+      description: props.description || '',
     };
   }
+}
+
+export interface BeeHiveModel {
+  ref: string;
+  id: string;
+  owner: string;
+  name: string;
+  location: GeoPoint;
+  data: BeeHiveDataModel[];
+  description?: string;
 }
 
 export interface BeeHiveDataModel {

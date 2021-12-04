@@ -98,7 +98,7 @@ const AuthenticationCard = (props: AuthenticationCardModel) => {
     } else {
       const credentials: {
         email: string;
-        password: string;
+        // password: string;
         firstName: string;
         lastName: string;
         role?: UserRole;
@@ -107,7 +107,7 @@ const AuthenticationCard = (props: AuthenticationCardModel) => {
         firstName: registerForm.firstName.value,
         lastName: registerForm.lastName.value,
         email: registerForm.email.value,
-        password: registerForm.password.value,
+        // password: registerForm.password.value,
         role: props.role,
       };
       if (props.role === 'employee') {

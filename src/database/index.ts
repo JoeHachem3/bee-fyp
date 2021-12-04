@@ -1,5 +1,3 @@
-import config from '../config';
-import { initializeApp } from 'firebase/app';
 import {
   getAuth,
   signInWithEmailAndPassword,
@@ -7,24 +5,23 @@ import {
 } from 'firebase/auth';
 import {
   onSnapshot,
-  getFirestore,
   getDocs,
   addDoc,
   query,
   where,
-  Query,
   collection,
+  updateDoc,
+  doc,
 } from 'firebase/firestore';
 import * as models from './models';
 import store from '../store';
 import * as userActions from '../store/user/actions';
-import { GeoPoint } from 'firebase/firestore/lite';
-
-const firebaseConfig = config.firebase;
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+import db from './config';
 
 export const auth = getAuth();
+
+const usersCollection = collection(db, 'users');
+const beeHivesCollection = collection(db, 'bee-hives');
 
 // Auth
 export async function login(credentials: { email: string; password: string }) {
@@ -36,7 +33,6 @@ export async function login(credentials: { email: string; password: string }) {
     );
   } catch (error) {
     const user = await getUserByEmail(credentials.email);
-    console.log(user);
     if (user) {
       try {
         createUserWithEmailAndPassword(
@@ -51,21 +47,9 @@ export async function login(credentials: { email: string; password: string }) {
   }
 }
 
-export async function register(
-  credentials: models.FirebaseUserModel & { password: string },
-) {
+export async function register(credentials: models.FirebaseUserModel) {
   try {
-    const user = { ...credentials };
-    delete user.password;
-    await createUser(user);
-    console.log(store.getState().userReducer.user);
-    if (!store.getState().userReducer.user) {
-      createUserWithEmailAndPassword(
-        auth,
-        credentials.email,
-        credentials.password,
-      );
-    }
+    await createUser(credentials);
   } catch (error) {
     console.log(error);
     return error;
@@ -78,10 +62,24 @@ export async function logout() {
 
 // Users
 export async function getUserByEmail(email: string) {
-  const q = query(collection(db, 'users'), where('email', '==', email));
+  const q = query(usersCollection, where('email', '==', email));
   const usersSnapshot = await getDocs(q);
-  const users = usersSnapshot.docs.map((doc) => doc.data());
-  return users[0];
+  const users = usersSnapshot.docs.map((doc) => ({
+    ...doc.data(),
+    ref: doc.id,
+  }));
+
+  const user = users[0] as models.UserModel & models.EmployeeModel;
+  if (user.worksFor) {
+    const beeHives = await getBeeHivesByOwnerEmail(user.worksFor);
+    user.beeHives = {};
+    beeHives.forEach((beeHive) => {
+      if (user.worksIn.includes(beeHive.id))
+        user.beeHives[beeHive.id] = beeHive;
+    });
+  }
+
+  return user;
 }
 
 export async function createUser(user: models.FirebaseUserModel) {
@@ -89,8 +87,11 @@ export async function createUser(user: models.FirebaseUserModel) {
     Object.keys(user).forEach((key) => {
       if (user[key] === undefined) delete user[key];
     });
-    const docRef = await addDoc(collection(db, 'users'), user);
-    console.log('Document written with ID: ', docRef.id);
+    const existingUser = await getUserByEmail(user.email);
+    if (existingUser) {
+      return;
+    }
+    await addDoc(usersCollection, user);
     return new models.FirebaseUserModel(user);
   } catch (e) {
     console.error('Error adding document: ', e);
@@ -98,81 +99,80 @@ export async function createUser(user: models.FirebaseUserModel) {
 }
 
 // Employees
-export function onEmployeesChanged(workingFor: string) {
-  const q = query(collection(db, 'users'), where('worksFor', '==', workingFor));
+export function onEmployeesChanged(worksFor: string) {
+  const q = query(usersCollection, where('worksFor', '==', worksFor));
   onSnapshot(q, (querySnapshot) => {
-    const employees = [];
-    querySnapshot.forEach((doc) => employees.push(doc.data()));
-    store.dispatch(userActions.setEmployees(employees));
+    const newEmployees = {};
+    querySnapshot.forEach((doc) => {
+      const employee = {
+        ...doc.data(),
+        ref: doc.id,
+      } as any as models.EmployeeModel;
+      newEmployees[employee.email] = new models.EmployeeModel(employee);
+    });
+
+    store.dispatch(userActions.setEmployees(newEmployees));
   });
 }
 
 // BeeHives
 export function onBeeHivesChanged(ownerEmail: string) {
-  const q = query(
-    collection(db, 'bee-hives'),
-    where('owner', '==', ownerEmail),
-  );
+  const q = query(beeHivesCollection, where('owner', '==', ownerEmail));
   onSnapshot(q, (querySnapshot) => {
-    const beeHives = [];
-    querySnapshot.forEach((doc) => beeHives.push(doc.data()));
+    const beeHives = {};
+    querySnapshot.forEach((doc) => {
+      const beeHive = { ...doc.data(), ref: doc.id } as models.BeeHiveModel;
+      beeHives[beeHive.id] = beeHive;
+    });
     store.dispatch(userActions.setBeeHives(beeHives));
   });
 }
 
 export async function getBeeHiveById(id: string) {
-  const q = query(collection(db, 'bee-hives'), where('id', '==', id));
+  const q = query(beeHivesCollection, where('id', '==', id));
   const beeHivesSnapshot = await getDocs(q);
-  const beeHives = beeHivesSnapshot.docs.map((doc) => doc.data());
-  return beeHives;
-}
-
-export async function getBeeHives(): Promise<models.BeeHiveModel[]> {
-  const beeHivesSnapshot = await getDocs<models.BeeHiveModel>(
-    collection(db, 'bee-hives') as any as Query<models.BeeHiveModel>,
-  );
-  const beeHives = beeHivesSnapshot.docs.map((doc) => doc.data());
+  const beeHives = beeHivesSnapshot.docs.map((doc) => ({
+    ...doc.data(),
+    ref: doc.id,
+  }));
   return beeHives;
 }
 
 export async function getBeeHivesByOwnerEmail(
   ownerEmail: string,
 ): Promise<models.BeeHiveModel[]> {
-  const q = query(
-    collection(db, 'bee-hives'),
-    where('owner', '==', ownerEmail),
-  );
+  const q = query(beeHivesCollection, where('owner', '==', ownerEmail));
   const usersSnapshot = await getDocs(q);
-  const beeHives = usersSnapshot.docs.map((doc) =>
-    doc.data(),
-  ) as any as models.BeeHiveModel[];
+  const beeHives = usersSnapshot.docs.map((doc) => ({
+    ...doc.data(),
+    ref: doc.id,
+  })) as any as models.BeeHiveModel[];
   return beeHives;
 }
 
-export async function setBeeHive(beeHive: models.BeeHiveModel) {
+export async function createBeeHive(beeHive: models.FirebaseBeeHiveModel) {
   try {
-    const docRef = await addDoc(
-      collection(db, 'bee-hives'),
-      new models.BeeHiveModel(beeHive),
-    );
-    console.log('Document written with ID: ', docRef.id);
+    await addDoc(beeHivesCollection, new models.FirebaseBeeHiveModel(beeHive));
   } catch (e) {
     console.error('Error adding document: ', e);
   }
 }
 
-// console.log(
-//   Math.floor(Math.random() * 180 - 90),
-//   Math.floor(Math.random() * 360 - 180),
-// );
+export async function updateEmployee(
+  ref: string,
+  credentials: models.Optional<models.FirebaseUserModel>,
+) {
+  updateDoc(doc(db, 'users', ref), credentials);
+}
 
-// setBeeHive({
+// createBeeHive({
 //   location: new GeoPoint(
 //     Math.floor(Math.random() * 180 - 90),
 //     Math.floor(Math.random() * 360 - 180),
 //   ),
 //   name: 'Name' + Math.random() * 10,
-//   owner: 'emp1@gmail.com',
+//   owner: 'chris@gmail.com',
+//   employee: 'emp2@gmail.com',
 //   data: [
 //     {
 //       timestamp: '10/24/2021 0:00',
