@@ -139,7 +139,7 @@ const Employees = () => {
   };
 
   const removeEmployee = (employee: EmployeeModel) => {
-    updateEmployee(employee.ref, { worksFor: '' });
+    updateEmployee(employee.ref, { worksFor: '', worksIn: [] });
   };
 
   return (
