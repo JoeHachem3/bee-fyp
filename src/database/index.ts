@@ -70,7 +70,7 @@ export async function getUserByEmail(email: string) {
   }));
 
   const user = users[0] as models.UserModel & models.EmployeeModel;
-  if (user.worksFor) {
+  if (user?.worksFor) {
     const beeHives = await getBeeHivesByOwnerEmail(user.worksFor);
     user.beeHives = {};
     beeHives.forEach((beeHive) => {
