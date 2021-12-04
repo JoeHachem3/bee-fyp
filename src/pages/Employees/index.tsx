@@ -1,12 +1,13 @@
 import classes from './employees.module.css';
 import SpeedDial from '../../components/SpeedDial';
-import { Person, Place } from '@mui/icons-material';
+import { Person, Place, Close } from '@mui/icons-material';
 import {
   SpeedDialAction,
   Dialog,
   Card,
   CardContent,
   Chip,
+  IconButton,
 } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import AuthenticationCard from '../../components/AuthenticationCard';
@@ -137,6 +138,10 @@ const Employees = () => {
     }
   };
 
+  const removeEmployee = (employee: EmployeeModel) => {
+    updateEmployee(employee.ref, { worksFor: '' });
+  };
+
   return (
     <div className={classes.employees}>
       {user?.beeHives && (
@@ -188,10 +193,21 @@ const Employees = () => {
                     height: '100%',
                   }}
                 >
-                  <Chip
-                    sx={{ color: 'var(--color-text)' }}
-                    label={`${employee.firstName} ${employee.lastName}`}
-                  />
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <Chip
+                      sx={{ color: 'var(--color-text)' }}
+                      label={`${employee.firstName} ${employee.lastName}`}
+                    />
+                    <IconButton onClick={() => removeEmployee(employee)}>
+                      <Close sx={{ fill: 'var(--color-text)' }} />
+                    </IconButton>
+                  </div>
                   <DragAndDropList
                     internalScroll
                     key={key}
