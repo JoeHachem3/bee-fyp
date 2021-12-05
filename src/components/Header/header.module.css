@@ -9,3 +9,13 @@
   display: flex;
   justify-content: center;
 }
+
+.toggle-button {
+  justify-content: flex-start !important;
+  width: 100% !important;
+  gap: 1rem !important;
+  text-transform: none !important;
+  margin: 0 !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+}

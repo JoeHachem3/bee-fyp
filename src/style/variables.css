@@ -1,7 +1,10 @@
 :root {
+  --color-primary-80: hsl(46, 91%, 29%);
   --color-primary: #f0b90b;
+  --color-primary-120: hsl(46, 91%, 69%);
 
   --color-warning: #ff3c00;
+  --color-warning-faded: #ff3c0033;
 
   --color-black-90: #4a4a4a;
   --color-black: #303030;

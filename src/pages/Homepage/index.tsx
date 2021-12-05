@@ -14,8 +14,14 @@ import { useSelector } from 'react-redux';
 import { AppState } from '../../store/state';
 import { GeoPoint } from 'firebase/firestore/lite';
 import BottomDrawer from '../../components/BottomDrawer';
-import { Cloud, DateRange } from '@mui/icons-material';
-import { Dialog } from '@mui/material';
+import {
+  Cloud,
+  DateRange,
+  Thermostat,
+  AccessTime,
+  InvertColorsTwoTone,
+} from '@mui/icons-material';
+import { Dialog, IconButton, Typography } from '@mui/material';
 
 const Homepage = () => {
   const user = useSelector((state: AppState) => state.userReducer.user);
@@ -134,6 +140,46 @@ const Homepage = () => {
                 location={weatherData.location}
                 name={weatherData.name || ''}
               />
+              {graphData.data?.length && (
+                <div className={classes['latest-data']}>
+                  <Typography
+                    color='var(--color-primary)'
+                    fontWeight='500'
+                    variant='h6'
+                    component='h6'
+                  >
+                    Latest Data
+                  </Typography>
+                  <div className={classes['latest-data-list']}>
+                    <IconButton>
+                      <AccessTime className={classes.icons} />
+                    </IconButton>
+                    <span>
+                      {moment(
+                        graphData.data[graphData.data.length - 1].timestamp,
+                      ).format('MMM, DD YYYY - HH:mm')}
+                    </span>
+
+                    <IconButton>
+                      <Thermostat className={classes.icons} />
+                    </IconButton>
+                    <span>
+                      {`${graphData.data[
+                        graphData.data.length - 1
+                      ].temperature.toFixed(0)} C`}
+                    </span>
+
+                    <IconButton>
+                      <InvertColorsTwoTone className={classes.icons} />
+                    </IconButton>
+                    <span>
+                      {`${graphData.data[
+                        graphData.data.length - 1
+                      ].humidity.toFixed(0)} %`}
+                    </span>
+                  </div>
+                </div>
+              )}
             </Dialog>
             <Dialog
               open={isRangePickerOpen}

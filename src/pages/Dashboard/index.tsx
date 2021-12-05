@@ -1,4 +1,4 @@
-import classes from './employees.module.css';
+import classes from './dashboard.module.css';
 import SpeedDial from '../../components/SpeedDial';
 import { Person, Place, Close } from '@mui/icons-material';
 import {
@@ -17,9 +17,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { AppState } from '../../store/state';
 import { BeeHiveModel, EmployeeModel } from '../../database/models';
 import * as userActions from '../../store/user/actions';
-import { updateEmployee } from '../../database';
+import { updateBeeHive, updateEmployee } from '../../database';
+import moment from 'moment';
 
-const Employees = () => {
+const Dashboard = () => {
   const dispatch = useDispatch();
 
   const user = useSelector((state: AppState) => state.userReducer.user);
@@ -34,13 +35,26 @@ const Employees = () => {
     useState<boolean>(false);
   const [isBeeHiveCardOpen, setIsBeeHiveCardOpen] = useState<boolean>(false);
 
-  const [beeHivesArray, setBeeHivesArray] = useState<BeeHiveModel[]>([]);
+  const [ownerBeeHives, setOwnerBeeHives] = useState<BeeHiveModel[]>([]);
+  const [deletedBeeHives, setDeletedBeeHives] = useState<BeeHiveModel[]>([]);
 
   useEffect(() => {
     const beeHives = Object.entries(user?.beeHives || {}).map(
       ([key, beeHive]) => beeHive,
     );
-    setBeeHivesArray(beeHives);
+
+    const ownerBeeHives = beeHives.filter(
+      (beeHive) =>
+        !beeHive.deletedAt &&
+        !Object.entries(user.employees).find(([key, employee]) =>
+          employee.worksIn.includes(beeHive.id),
+        ),
+    );
+
+    const deletedBeeHives = beeHives.filter((beeHive) => beeHive.deletedAt);
+
+    setOwnerBeeHives(ownerBeeHives);
+    setDeletedBeeHives(deletedBeeHives);
   }, [user]);
 
   const actions = [
@@ -66,14 +80,72 @@ const Employees = () => {
     if (
       !destination ||
       (source.droppableId === user.email &&
-        destination.droppableId === user.email)
+        destination.droppableId === user.email) ||
+      (source.droppableId === 'deleted' &&
+        destination.droppableId === 'deleted')
     )
       return;
-    else if (source.droppableId === user.email) {
+
+    if (source.droppableId === 'deleted') {
+      const beeHive = deletedBeeHives[source.index];
+      updateBeeHive(beeHive.ref, { deletedAt: '' });
+
+      if (destination.droppableId !== user.email) {
+        const employee = JSON.parse(
+          JSON.stringify(user.employees[destination.droppableId]),
+        ) as EmployeeModel;
+        const currentBeeHive = deletedBeeHives[source.index]?.id;
+
+        if (!currentBeeHive) return;
+
+        const worksIn = [];
+        employee.worksIn.forEach((beeHive, index) => {
+          if (index === destination.index) {
+            worksIn.includes(currentBeeHive) || worksIn.push(currentBeeHive);
+          }
+          worksIn.includes(beeHive) || worksIn.push(beeHive);
+        });
+        if (employee.worksIn.length <= destination.index)
+          worksIn.includes(currentBeeHive) || worksIn.push(currentBeeHive);
+
+        employee.worksIn = worksIn;
+
+        updateEmployee(employee.ref, { worksIn });
+        setEmployees({ ...user.employees, [employee.email]: employee });
+      }
+    } else if (destination.droppableId === 'deleted') {
+      if (source.droppableId === user.email) {
+        const currentBeeHive = ownerBeeHives[source.index];
+        if (!currentBeeHive) return;
+
+        updateBeeHive(currentBeeHive.ref, {
+          deletedAt: moment().format('MM/DD/YYYY'),
+        });
+      } else {
+        const employee = JSON.parse(
+          JSON.stringify(user.employees[source.droppableId]),
+        ) as EmployeeModel;
+        const currentBeeHive = user.beeHives[employee.worksIn[source.index]];
+
+        if (!currentBeeHive) return;
+
+        const worksIn = employee.worksIn.filter(
+          (beeHive) => beeHive !== currentBeeHive.id,
+        );
+
+        employee.worksIn = worksIn;
+
+        updateEmployee(employee.ref, { worksIn });
+        updateBeeHive(currentBeeHive.ref, {
+          deletedAt: moment().format('MM/DD/YYYY'),
+        });
+        setEmployees({ ...user.employees, [employee.email]: employee });
+      }
+    } else if (source.droppableId === user.email) {
       const employee = JSON.parse(
         JSON.stringify(user.employees[destination.droppableId]),
       ) as EmployeeModel;
-      const currentBeeHive = beeHivesArray[source.index].id;
+      const currentBeeHive = ownerBeeHives[source.index]?.id;
 
       if (!currentBeeHive) return;
 
@@ -143,7 +215,7 @@ const Employees = () => {
   };
 
   return (
-    <div className={classes.employees}>
+    <div className={classes.dashboard}>
       {user?.beeHives && (
         <DragDropContext
           onDragEnd={({ destination, source }) =>
@@ -169,12 +241,7 @@ const Employees = () => {
                   direction='horizontal'
                   internalScroll
                   listId={user.email}
-                  beeHives={beeHivesArray.filter(
-                    (beeHive) =>
-                      !Object.entries(user.employees).find(([key, employee]) =>
-                        employee.worksIn.includes(beeHive.id),
-                      ),
-                  )}
+                  beeHives={ownerBeeHives}
                 />
               </CardContent>
             </Card>
@@ -218,6 +285,30 @@ const Employees = () => {
               </Card>
             ))}
           </div>
+
+          <div className={classes.deleted}>
+            <Card
+              sx={{
+                backgroundColor: 'var(--color-warning-faded)',
+                width: '100%',
+                border: '1px solid var(--color-warning)',
+              }}
+            >
+              <CardContent
+                sx={{
+                  height: '100%',
+                }}
+              >
+                <Chip sx={{ color: 'var(--color-text)' }} label={`Deleted`} />
+                <DragAndDropList
+                  direction='horizontal'
+                  internalScroll
+                  listId={'deleted'}
+                  beeHives={deletedBeeHives}
+                />
+              </CardContent>
+            </Card>
+          </div>
         </DragDropContext>
       )}
 
@@ -242,4 +333,4 @@ const Employees = () => {
   );
 };
 
-export default Employees;
+export default Dashboard;

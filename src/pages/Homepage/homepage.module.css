@@ -20,3 +20,28 @@
 .date-picker {
   margin-left: 62px;
 }
+
+.latest-data {
+  padding: 1rem;
+  background-color: var(--color-background-110);
+}
+
+.latest-data-list {
+  display: grid;
+  grid-template-columns: 1fr 11fr;
+  align-items: center;
+  justify-items: start;
+  gap: 0.5rem;
+}
+
+.latest-data-list span {
+  color: var(--color-text);
+}
+
+.icons {
+  fill: var(--color-primary) !important;
+}
+
+.icons * {
+  opacity: 1;
+}

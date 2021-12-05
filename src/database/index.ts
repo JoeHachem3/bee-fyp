@@ -115,6 +115,13 @@ export function onEmployeesChanged(worksFor: string) {
   });
 }
 
+export async function updateEmployee(
+  ref: string,
+  credentials: models.Optional<models.FirebaseUserModel>,
+) {
+  updateDoc(doc(db, 'users', ref), credentials);
+}
+
 // BeeHives
 export function onBeeHivesChanged(ownerEmail: string) {
   const q = query(beeHivesCollection, where('owner', '==', ownerEmail));
@@ -158,11 +165,11 @@ export async function createBeeHive(beeHive: models.FirebaseBeeHiveModel) {
   }
 }
 
-export async function updateEmployee(
+export async function updateBeeHive(
   ref: string,
-  credentials: models.Optional<models.FirebaseUserModel>,
+  credentials: models.Optional<models.BeeHiveModel>,
 ) {
-  updateDoc(doc(db, 'users', ref), credentials);
+  updateDoc(doc(db, 'bee-hives', ref), credentials);
 }
 
 // createBeeHive({
@@ -172,7 +179,6 @@ export async function updateEmployee(
 //   ),
 //   name: 'Name' + Math.random() * 10,
 //   owner: 'chris@gmail.com',
-//   employee: 'emp2@gmail.com',
 //   data: [
 //     {
 //       timestamp: '10/24/2021 0:00',

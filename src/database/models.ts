@@ -85,6 +85,7 @@ export interface BeeHiveModel {
   location: GeoPoint;
   data: BeeHiveDataModel[];
   description?: string;
+  deletedAt?: string;
 }
 
 export interface BeeHiveDataModel {

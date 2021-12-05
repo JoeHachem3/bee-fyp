@@ -6,7 +6,7 @@ const SpeedDial = (props: { children?: React.ReactElement[] }) => {
     <Box sx={{ flexGrow: 1 }}>
       <SD
         ariaLabel='SpeedDial'
-        sx={{ position: 'absolute', bottom: 16, right: 16 }}
+        sx={{ position: 'fixed', bottom: 16, right: 16 }}
         icon={<SpeedDialIcon />}
       >
         {props.children}

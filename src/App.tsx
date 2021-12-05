@@ -8,7 +8,7 @@ import { ThemeProvider } from '@mui/material';
 
 import Homepage from './pages/Homepage';
 import Authentication from './pages/Authentication';
-import Employees from './pages/Employees';
+import Dashboard from './pages/Dashboard';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppState } from './store/state';
 import { useCallback, useEffect } from 'react';
@@ -65,22 +65,21 @@ const App = () => {
         <ThemeProvider theme={setTheme(theme)}>
           <Header logo={BeeBlack} title='Bee FYP'></Header>
           <div className={'main-container'}>
-            <Switch>
-              {user ? (
-                <>
-                  <Route exact path='/' component={Homepage} />
-                  {user.role === 'owner' && (
-                    <Route exact path='/employees' component={Employees} />
-                  )}
-                </>
-              ) : (
-                <>
-                  <Route exact path='/' component={Authentication} />
-                  <Route exact path='/employees' component={Authentication} />
-                </>
-              )}
-              <Redirect to='/' />
-            </Switch>
+            {user ? (
+              <Switch>
+                <Route exact path='/' component={Homepage} />
+                {user.role === 'owner' && (
+                  <Route exact path='/dashboard' component={Dashboard} />
+                )}
+                <Redirect to='/' />
+              </Switch>
+            ) : (
+              <Switch>
+                <Route exact path='/' component={Authentication} />
+                <Route exact path='/dashboard' component={Authentication} />
+                <Redirect to='/' />
+              </Switch>
+            )}
           </div>
         </ThemeProvider>
       </BrowserRouter>

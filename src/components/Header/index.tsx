@@ -13,7 +13,7 @@ import {
   LightMode,
   DarkMode,
   Settings,
-  People,
+  Dashboard,
   Home,
 } from '@mui/icons-material';
 import Toolbar from '../Toolbar';
@@ -95,31 +95,21 @@ const Header = (props: { title?: string; logo?: string }) => {
                       }
                     >
                       <ToggleButton
+                        className={classes['toggle-button']}
                         value=''
                         aria-label='homepage'
-                        sx={{
-                          justifyContent: 'flex-start',
-                          width: '100%',
-                          gap: '1rem',
-                          textTransform: 'none',
-                        }}
                         onClick={() => setIsDrawerOpen(true)}
                       >
                         <Home /> Homepage
                       </ToggleButton>
                       {user?.role === 'owner' && (
                         <ToggleButton
-                          value='employees'
-                          aria-label='employees'
-                          sx={{
-                            justifyContent: 'flex-start',
-                            width: '100%',
-                            gap: '1rem',
-                            textTransform: 'none',
-                          }}
+                          className={classes['toggle-button']}
+                          value='dashboard'
+                          aria-label='dashboard'
                           onClick={() => setIsDrawerOpen(true)}
                         >
-                          <People /> Employees
+                          <Dashboard /> Dashboard
                         </ToggleButton>
                       )}
                     </ToggleButtonGroup>
