@@ -3,6 +3,7 @@ interface AuthenticationCardModel {
   hideErrorMessage?: boolean;
   isLogin?: boolean;
   role?: 'owner' | 'employee' | 'admin';
+  afterSubmit?: () => any;
 }
 
 export default AuthenticationCardModel;

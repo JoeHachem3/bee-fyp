@@ -1,9 +1,0 @@
-.bee-marker {
-  width: 34px;
-  height: 34px;
-  cursor: pointer;
-  transition: 0.1s ease-in-out;
-}
-.bee-marker:hover {
-  transform: scale(1.1);
-}

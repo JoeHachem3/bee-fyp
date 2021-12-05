@@ -1,4 +1,4 @@
-import { GeoPoint } from 'firebase/firestore/lite';
+import { GeoPoint } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 
 export type Optional<Type> = {

@@ -12,7 +12,7 @@ import { BeeHiveModel } from '../../database/models';
 import classes from './homepage.module.css';
 import { useSelector } from 'react-redux';
 import { AppState } from '../../store/state';
-import { GeoPoint } from 'firebase/firestore/lite';
+import { GeoPoint } from 'firebase/firestore';
 import BottomDrawer from '../../components/BottomDrawer';
 import {
   Cloud,
@@ -20,8 +20,11 @@ import {
   Thermostat,
   AccessTime,
   InvertColorsTwoTone,
+  Place,
 } from '@mui/icons-material';
-import { Dialog, IconButton, Typography } from '@mui/material';
+import { Dialog, IconButton, Typography, SpeedDialAction } from '@mui/material';
+import SpeedDial from '../../components/SpeedDial';
+import BeeHiveCard from '../../components/BeeHiveCard';
 
 const Homepage = () => {
   const user = useSelector((state: AppState) => state.userReducer.user);
@@ -32,11 +35,21 @@ const Homepage = () => {
   const [weatherData, setWeatherData] = useState<WeatherModel>();
   const [isWeatherCardOpen, setIsWeatherCardOpen] = useState<boolean>(false);
   const [isRangePickerOpen, setIsRangePickerOpen] = useState<boolean>(false);
+  const [addBeeHiveMode, setAddBeeHiveMode] = useState<boolean>(false);
+  const [newBeeHiveLocation, setNewBeeHiveLocation] = useState<GeoPoint>();
+
+  const actions = [
+    {
+      icon: <Place />,
+      name: 'Add Bee Hive',
+      onClick: () => setAddBeeHiveMode(user?.role === 'owner'),
+    },
+  ];
 
   const getData = (hive: BeeHiveModel) => {
     const xAxis = 'timestamp';
 
-    const lines = Object.keys(hive.data[0])
+    const lines = Object.keys(hive.data[0] || {})
       .filter((key) => key !== xAxis)
       .map((key) => {
         return { key };
@@ -48,7 +61,7 @@ const Homepage = () => {
     });
     setDateRangePickerData({
       ...dateRangePickerData,
-      startDate: new Date(hive.data[0][xAxis]),
+      startDate: new Date(hive.data[0] ? hive.data[0][xAxis] : ''),
     });
   };
 
@@ -84,7 +97,9 @@ const Homepage = () => {
 
   const center = { lng: 0, lat: 0 };
   if (user?.beeHives) {
-    const beeHives = Object.entries(user.beeHives || {});
+    const beeHives = Object.entries(user.beeHives || {}).filter(
+      ([key, hive]) => !hive.deletedAt,
+    );
     if (beeHives.length) {
       beeHives.forEach(([key, hive]) => {
         center.lng += hive.location.longitude;
@@ -99,16 +114,20 @@ const Homepage = () => {
     <>
       <div className={classes.map}>
         <Map
+          addNew={addBeeHiveMode}
+          onAddNew={(location) => setNewBeeHiveLocation(location)}
           center={new GeoPoint(center.lat, center.lng)}
-          zoom={3}
-          markers={Object.entries(user?.beeHives || {})?.map(([key, hive]) => {
-            return {
-              location: hive.location,
-              description: hive.description,
-              name: hive.name,
-              onClick: () => onMarkerClick(hive),
-            };
-          })}
+          zoom={2}
+          markers={Object.entries(user?.beeHives || {})
+            ?.filter(([key, hive]) => !hive.deletedAt)
+            .map(([key, hive]) => {
+              return {
+                location: hive.location,
+                description: hive.description,
+                name: hive.name,
+                onClick: () => onMarkerClick(hive),
+              };
+            })}
         />
       </div>
 
@@ -140,7 +159,7 @@ const Homepage = () => {
                 location={weatherData.location}
                 name={weatherData.name || ''}
               />
-              {graphData.data?.length && (
+              {graphData.data?.length ? (
                 <div className={classes['latest-data']}>
                   <Typography
                     color='var(--color-primary)'
@@ -179,7 +198,7 @@ const Homepage = () => {
                     </span>
                   </div>
                 </div>
-              )}
+              ) : null}
             </Dialog>
             <Dialog
               open={isRangePickerOpen}
@@ -195,6 +214,35 @@ const Homepage = () => {
           </>
         )}
       </BottomDrawer>
+
+      <Dialog
+        open={!!newBeeHiveLocation}
+        onClose={() => {
+          setNewBeeHiveLocation(undefined);
+          setAddBeeHiveMode(false);
+        }}
+      >
+        <BeeHiveCard
+          location={newBeeHiveLocation}
+          afterSubmit={() => {
+            setNewBeeHiveLocation(undefined);
+            setAddBeeHiveMode(false);
+          }}
+        />
+      </Dialog>
+      {user?.role === 'owner' && (
+        <SpeedDial>
+          {actions.map((action) => (
+            <SpeedDialAction
+              className={classes['speed-dial-action']}
+              key={action.name}
+              icon={action.icon}
+              tooltipTitle={action.name}
+              onClick={action.onClick}
+            />
+          ))}
+        </SpeedDial>
+      )}
     </>
   );
 };

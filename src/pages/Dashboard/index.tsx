@@ -33,7 +33,6 @@ const Dashboard = () => {
 
   const [isAuthenticationCardOpen, setIsAuthenticationCardOpen] =
     useState<boolean>(false);
-  const [isBeeHiveCardOpen, setIsBeeHiveCardOpen] = useState<boolean>(false);
 
   const [ownerBeeHives, setOwnerBeeHives] = useState<BeeHiveModel[]>([]);
   const [deletedBeeHives, setDeletedBeeHives] = useState<BeeHiveModel[]>([]);
@@ -62,11 +61,6 @@ const Dashboard = () => {
       icon: <Person />,
       name: 'Add Employee',
       onClick: () => setIsAuthenticationCardOpen(true),
-    },
-    {
-      icon: <Place />,
-      name: 'Add Bee Hive',
-      onClick: () => setIsBeeHiveCardOpen(true),
     },
   ];
 

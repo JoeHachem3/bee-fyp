@@ -159,9 +159,11 @@ export async function getBeeHivesByOwnerEmail(
 
 export async function createBeeHive(beeHive: models.FirebaseBeeHiveModel) {
   try {
+    console.log(beeHive);
     await addDoc(beeHivesCollection, new models.FirebaseBeeHiveModel(beeHive));
   } catch (e) {
     console.error('Error adding document: ', e);
+    return e;
   }
 }
 

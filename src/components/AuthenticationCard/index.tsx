@@ -42,7 +42,9 @@ const AuthenticationCard = (props: AuthenticationCardModel) => {
   const onInputChange = (event, key: string) => {
     if (isLogin) {
       if (!loginForm[key]) return;
-      const valid = isValueValid(event.target.value, loginForm[key].type);
+      const valid = loginForm[key].noValidate
+        ? true
+        : isValueValid(event.target.value, loginForm[key].type);
       let isValid = true;
       Object.keys(loginForm).forEach((k) => {
         isValid = isValid && (k === key ? valid : loginForm[k].valid);
@@ -117,12 +119,14 @@ const AuthenticationCard = (props: AuthenticationCardModel) => {
     }
     setIsLoading(false);
 
-    if (error && !props.hideErrorMessage) {
-      setIsLoading(false);
-      if (error.code.includes('user-not-found'))
-        setErrorMessage('Incorrect Username or Password.');
-      else setErrorMessage('Something Went Wrong. Please Try again Later.');
-    }
+    if (error) {
+      if (!props.hideErrorMessage) {
+        setIsLoading(false);
+        if (error.code.includes('user-not-found'))
+          setErrorMessage('Incorrect Username or Password.');
+        else setErrorMessage('Something Went Wrong. Please Try again Later.');
+      }
+    } else props.afterSubmit && props.afterSubmit();
   };
 
   const form = isLogin ? loginForm : registerForm;

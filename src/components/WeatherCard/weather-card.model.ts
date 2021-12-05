@@ -1,4 +1,4 @@
-import { GeoPoint } from 'firebase/firestore/lite';
+import { GeoPoint } from 'firebase/firestore';
 
 interface WeatherCardModel {
   location: GeoPoint;

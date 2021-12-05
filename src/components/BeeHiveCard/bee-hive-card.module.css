@@ -1,0 +1,35 @@
+.authentication-card {
+  max-width: 100vw;
+  width: 400px;
+}
+
+.form,
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+
+.text-field input,
+.text-field textarea {
+  color: var(--color-text) !important;
+  /* -webkit-text-fill-color: var(--color-text) !important; */
+}
+
+.authentication-button {
+  text-transform: none !important;
+  color: var(--color-dark);
+  transition: color 0.3s ease-in-out;
+}
+.authentication-button:disabled {
+  color: var(--color-text) !important;
+  opacity: 0.6;
+}
+
+.authentication-button.loading {
+  color: transparent !important;
+}
+
+.authentication-button.loading span {
+  color: var(--color-text) !important;
+}
