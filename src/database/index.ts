@@ -49,7 +49,8 @@ export async function login(credentials: { email: string; password: string }) {
 
 export async function register(credentials: models.FirebaseUserModel) {
   try {
-    await createUser(credentials);
+    const error = await createUser(credentials);
+    return error;
   } catch (error) {
     console.log(error);
     return error;
@@ -89,12 +90,11 @@ export async function createUser(user: models.FirebaseUserModel) {
     });
     const existingUser = await getUserByEmail(user.email);
     if (existingUser) {
-      return 'Email Already Exists';
+      return 'Email Already Exists.';
     }
     await addDoc(usersCollection, user);
-    return new models.FirebaseUserModel(user);
   } catch (e) {
-    console.error('Error adding document: ', e);
+    return 'Something Went Wrong. Please Try again Later.';
   }
 }
 
@@ -124,6 +124,7 @@ export async function updateEmployee(
 
 // BeeHives
 export function onBeeHivesChanged(ownerEmail: string) {
+  console.log('hey');
   const q = query(beeHivesCollection, where('owner', '==', ownerEmail));
   onSnapshot(q, (querySnapshot) => {
     const beeHives = {};

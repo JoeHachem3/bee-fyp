@@ -1,6 +1,6 @@
 import classes from './dashboard.module.css';
 import SpeedDial from '../../components/SpeedDial';
-import { Person, Place, Close } from '@mui/icons-material';
+import { Person, Close } from '@mui/icons-material';
 import {
   SpeedDialAction,
   Dialog,

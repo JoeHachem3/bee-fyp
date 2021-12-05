@@ -139,10 +139,17 @@ const Homepage = () => {
         open={!!weatherData}
         onClose={() => setWeatherData(undefined)}
         title={weatherData?.name}
-        additionalIconButtons={[
-          { icon: <Cloud />, onClick: () => setIsWeatherCardOpen(true) },
-          { icon: <DateRange />, onClick: () => setIsRangePickerOpen(true) },
-        ]}
+        additionalIconButtons={
+          graphData.data?.length
+            ? [
+                { icon: <Cloud />, onClick: () => setIsWeatherCardOpen(true) },
+                {
+                  icon: <DateRange />,
+                  onClick: () => setIsRangePickerOpen(true),
+                },
+              ]
+            : [{ icon: <Cloud />, onClick: () => setIsWeatherCardOpen(true) }]
+        }
       >
         {weatherData && (
           <>

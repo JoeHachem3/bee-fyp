@@ -122,7 +122,9 @@ const AuthenticationCard = (props: AuthenticationCardModel) => {
     if (error) {
       if (!props.hideErrorMessage) {
         setIsLoading(false);
-        if (error.code.includes('user-not-found'))
+        if (typeof error === 'string') {
+          setErrorMessage(error);
+        } else if (error.code.includes('user-not-found'))
           setErrorMessage('Incorrect Username or Password.');
         else setErrorMessage('Something Went Wrong. Please Try again Later.');
       }
