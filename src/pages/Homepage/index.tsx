@@ -112,7 +112,9 @@ const Homepage = () => {
 
   return (
     <>
-      <div className={classes.map}>
+      <div
+        className={`${classes.map} ${addBeeHiveMode ? 'add-new-bee-hive' : ''}`}
+      >
         <Map
           addNew={addBeeHiveMode}
           onAddNew={(location) => setNewBeeHiveLocation(location)}

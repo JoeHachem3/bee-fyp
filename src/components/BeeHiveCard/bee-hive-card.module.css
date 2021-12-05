@@ -13,7 +13,6 @@
 .text-field input,
 .text-field textarea {
   color: var(--color-text) !important;
-  /* -webkit-text-fill-color: var(--color-text) !important; */
 }
 
 .authentication-button {

@@ -12,7 +12,7 @@ import {
 import {
   LightMode,
   DarkMode,
-  Settings,
+  Menu,
   Dashboard,
   Home,
 } from '@mui/icons-material';
@@ -68,7 +68,7 @@ const Header = (props: { title?: string; logo?: string }) => {
 
         {user && (
           <IconButton onClick={() => setIsDrawerOpen(true)}>
-            <Settings />
+            <Menu />
           </IconButton>
         )}
         <>

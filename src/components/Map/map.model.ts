@@ -1,4 +1,5 @@
 import { GeoPoint } from 'firebase/firestore';
+import BeeGold from '../../images/bee-gold.svg';
 
 class MapModel {
   center?: GeoPoint;
@@ -11,6 +12,7 @@ class MapModel {
   }[];
   addNew?: boolean;
   onAddNew?: (location: GeoPoint) => any;
+  icon?: string;
 
   constructor(props: MapModel) {
     return {
@@ -19,6 +21,7 @@ class MapModel {
       markers: props.markers || [],
       addNew: !!props.addNew,
       onAddNew: props.onAddNew || ((location: GeoPoint) => {}),
+      icon: props.icon || BeeGold,
     };
   }
 }

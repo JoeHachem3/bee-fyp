@@ -7,38 +7,41 @@ import {
   useMapEvents,
 } from 'react-leaflet';
 import { Typography } from '@mui/material';
-import BeeGold from '../../images/bee-gold.svg';
 import L from 'leaflet';
 import { useState } from 'react';
 import { GeoPoint } from 'firebase/firestore';
-
-const beeIcon = new L.Icon({
-  iconUrl: BeeGold,
-  iconRetinaUrl: BeeGold,
-  iconAnchor: new L.Point(0, 0),
-  popupAnchor: new L.Point(16, 0),
-  shadowUrl: null,
-  shadowSize: null,
-  shadowAnchor: null,
-  iconSize: new L.Point(32, 32),
-  className: 'leaflet-icon',
-});
+import classes from './map.module.css';
 
 const Map = (props: MapModel) => {
   props = new MapModel(props);
 
+  const icon = new L.Icon({
+    iconUrl: props.icon,
+    iconRetinaUrl: props.icon,
+    iconAnchor: new L.Point(0, 0),
+    popupAnchor: new L.Point(16, 0),
+    shadowUrl: null,
+    shadowSize: null,
+    shadowAnchor: null,
+    iconSize: new L.Point(32, 32),
+    className: 'leaflet-icon',
+  });
+
   const NewBeeHiveMarker = () => {
-    const [position, setPosition] = useState(null);
     const map = useMapEvents({
       click: (e) => {
         if (!props.addNew) return;
-        setPosition(e.latlng);
+
+        e.latlng.lng = e.latlng.lng % 180;
+        if (e.latlng.lat > 84 || e.latlng.lat < -85.1) {
+          e.latlng.lat = 0;
+        }
         map.flyTo(e.latlng, map.getZoom());
         props.onAddNew(new GeoPoint(e.latlng.lat, e.latlng.lng));
       },
     });
 
-    return position && <Marker position={position} icon={beeIcon}></Marker>;
+    return <></>;
   };
 
   return (
@@ -47,7 +50,7 @@ const Map = (props: MapModel) => {
       zoom={props.zoom}
       scrollWheelZoom={true}
       minZoom={2}
-      maxBoundsViscosity={0}
+      maxBoundsViscosity={1.0}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -65,7 +68,7 @@ const Map = (props: MapModel) => {
               e.target.closePopup();
             },
           }}
-          icon={beeIcon}
+          icon={icon}
           position={[marker.location.latitude, marker.location.longitude]}
         >
           <NewBeeHiveMarker />

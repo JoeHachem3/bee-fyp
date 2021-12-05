@@ -36,12 +36,12 @@ const AuthenticationCard = (props: {
         latitude: {
           ...beeHiveForm.latitude,
           value: props.location.latitude,
-          disabled: true,
+          disabled: !!props.location.latitude,
         },
         longitude: {
           ...beeHiveForm.longitude,
           value: props.location.longitude,
-          disabled: true,
+          disabled: !!props.location.longitude,
         },
       });
     }
