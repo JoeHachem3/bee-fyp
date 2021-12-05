@@ -91,6 +91,8 @@ export interface BeeHiveModel {
 export interface BeeHiveDataModel {
   humidity: number;
   temperature: number;
+  weight: number;
+  flow: number;
   timestamp: string;
 }
 
