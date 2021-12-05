@@ -63,7 +63,7 @@ const App = () => {
     <>
       <BrowserRouter>
         <ThemeProvider theme={setTheme(theme)}>
-          <Header logo={BeeBlack} title='Bee FYP'></Header>
+          <Header logo={BeeBlack} title='BEEnterface'></Header>
           <div className={'main-container'}>
             {user ? (
               <Switch>
