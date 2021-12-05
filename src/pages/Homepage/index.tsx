@@ -20,6 +20,8 @@ import {
   Thermostat,
   AccessTime,
   InvertColorsTwoTone,
+  MonitorWeight,
+  CompareArrows,
   Place,
 } from '@mui/icons-material';
 import { Dialog, IconButton, Typography, SpeedDialAction } from '@mui/material';
@@ -172,32 +174,71 @@ const Homepage = () => {
                     Latest Data
                   </Typography>
                   <div className={classes['latest-data-list']}>
-                    <IconButton>
-                      <AccessTime className={classes.icons} />
-                    </IconButton>
-                    <span>
-                      {moment(
-                        graphData.data[graphData.data.length - 1].timestamp,
-                      ).format('MMM, DD YYYY - HH:mm')}
-                    </span>
-
-                    <IconButton>
-                      <Thermostat className={classes.icons} />
-                    </IconButton>
-                    <span>
-                      {`${graphData.data[
-                        graphData.data.length - 1
-                      ].temperature.toFixed(0)} C`}
-                    </span>
-
-                    <IconButton>
-                      <InvertColorsTwoTone className={classes.icons} />
-                    </IconButton>
-                    <span>
-                      {`${graphData.data[
-                        graphData.data.length - 1
-                      ].humidity.toFixed(0)} %`}
-                    </span>
+                    {graphData.data[graphData.data.length - 1].timestamp !==
+                      undefined && (
+                      <>
+                        <IconButton>
+                          <AccessTime className={classes.icons} />
+                        </IconButton>
+                        <span>
+                          {moment(
+                            graphData.data[graphData.data.length - 1].timestamp,
+                          ).format('MMM, DD YYYY - HH:mm')}
+                        </span>
+                      </>
+                    )}
+                    {graphData.data[graphData.data.length - 1].temperature !==
+                      undefined && (
+                      <>
+                        <IconButton>
+                          <Thermostat className={classes.icons} />
+                        </IconButton>
+                        <span>
+                          {`${graphData.data[
+                            graphData.data.length - 1
+                          ].temperature.toFixed(0)} C`}
+                        </span>
+                      </>
+                    )}
+                    {graphData.data[graphData.data.length - 1].humidity !==
+                      undefined && (
+                      <>
+                        <IconButton>
+                          <InvertColorsTwoTone className={classes.icons} />
+                        </IconButton>
+                        <span>
+                          {`${graphData.data[
+                            graphData.data.length - 1
+                          ].humidity.toFixed(0)} %`}
+                        </span>
+                      </>
+                    )}
+                    {graphData.data[graphData.data.length - 1].weight !==
+                      undefined && (
+                      <>
+                        <IconButton>
+                          <MonitorWeight className={classes.icons} />
+                        </IconButton>
+                        <span>
+                          {`${graphData.data[
+                            graphData.data.length - 1
+                          ].weight.toFixed(0)} Kg`}
+                        </span>
+                      </>
+                    )}
+                    {graphData.data[graphData.data.length - 1].flow !==
+                      undefined && (
+                      <>
+                        <IconButton>
+                          <CompareArrows className={classes.icons} />
+                        </IconButton>
+                        <span>
+                          {`${graphData.data[
+                            graphData.data.length - 1
+                          ].flow.toFixed(0)} Bees`}
+                        </span>
+                      </>
+                    )}
                   </div>
                 </div>
               ) : null}
