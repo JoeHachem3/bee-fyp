@@ -3,7 +3,7 @@ const rules: { [key: string]: RegExp[] } = {
     /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/,
   ],
   password: [/^[a-z0-9.]{8,24}$/],
-  text: [/[a-z0-9]/],
+  text: [/[a-zA-Z0-9]/],
 };
 
 export const isValueValid = (value: string, type: string): boolean => {
