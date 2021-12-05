@@ -61,7 +61,7 @@ const Homepage = () => {
     });
     setDateRangePickerData({
       ...dateRangePickerData,
-      startDate: new Date(hive.data[0] ? hive.data[0][xAxis] : ''),
+      startDate: hive.data[0] ? new Date(hive.data[0][xAxis]) : new Date(),
     });
   };
 
