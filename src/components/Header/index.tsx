@@ -54,6 +54,16 @@ const Header = (props: { title?: string; logo?: string }) => {
       title={props.title}
       onLogoClick={() => handleSideMenuChanges('')}
       minHeight='4rem'
+      additionalIcons={
+        user
+          ? [
+              {
+                icon: <Menu />,
+                onClick: () => setIsDrawerOpen(true),
+              },
+            ]
+          : []
+      }
     >
       <>
         {theme === 'dark' ? (
@@ -66,14 +76,9 @@ const Header = (props: { title?: string; logo?: string }) => {
           </IconButton>
         )}
 
-        {user && (
-          <IconButton onClick={() => setIsDrawerOpen(true)}>
-            <Menu />
-          </IconButton>
-        )}
         <>
           <Sidebar
-            anchor='right'
+            anchor='left'
             open={isDrawerOpen}
             onClose={() => setIsDrawerOpen(false)}
             onOpen={() => setIsDrawerOpen(true)}

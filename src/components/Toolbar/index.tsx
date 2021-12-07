@@ -1,11 +1,13 @@
 import { AppBar, Toolbar as Tb, Typography } from '@mui/material';
 import classes from './toolbar.module.css';
+import { IconButton } from '@mui/material';
 
 const Toolbar = (props: {
   logo?: string;
   title?: string;
   minHeight?: string;
   children?: React.ReactElement;
+  additionalIcons?: { icon: React.ReactElement; onClick: () => any }[];
   onLogoClick?: () => any;
 }) => {
   return (
@@ -22,6 +24,10 @@ const Toolbar = (props: {
           variant='h6'
           component='div'
         >
+          {props.additionalIcons &&
+            props.additionalIcons.map((icon) => (
+              <IconButton onClick={icon.onClick}>{icon.icon}</IconButton>
+            ))}
           {props.logo && (
             <img
               style={{

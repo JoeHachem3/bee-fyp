@@ -24,9 +24,18 @@ import {
   CompareArrows,
   Place,
 } from '@mui/icons-material';
-import { Dialog, IconButton, Typography, SpeedDialAction } from '@mui/material';
+import {
+  Dialog,
+  IconButton,
+  Typography,
+  SpeedDialAction,
+  Card,
+  Button,
+  CardActionArea,
+} from '@mui/material';
 import SpeedDial from '../../components/SpeedDial';
 import BeeHiveCard from '../../components/BeeHiveCard';
+import Sidebar from '../../components/Sidebar';
 
 const Homepage = () => {
   const user = useSelector((state: AppState) => state.userReducer.user);
@@ -40,10 +49,12 @@ const Homepage = () => {
   const [addBeeHiveMode, setAddBeeHiveMode] = useState<boolean>(false);
   const [newBeeHiveLocation, setNewBeeHiveLocation] = useState<GeoPoint>();
 
+  const [tmp, setTmp] = useState<boolean>(false);
+
   const actions = [
     {
       icon: <Place />,
-      name: 'Add Bee Hive',
+      name: 'Add Apiary',
       onClick: () => setAddBeeHiveMode(user?.role === 'owner'),
     },
   ];
@@ -129,7 +140,7 @@ const Homepage = () => {
                 location: hive.location,
                 description: hive.description,
                 name: hive.name,
-                onClick: () => onMarkerClick(hive),
+                onClick: () => setTmp(true),
               };
             })}
         />
@@ -280,6 +291,112 @@ const Homepage = () => {
           }}
         />
       </Dialog>
+
+      {/* FROM */}
+
+      <Sidebar
+        anchor='right'
+        open={tmp}
+        onClose={() => setTmp(false)}
+        onOpen={() => setTmp(true)}
+      >
+        <>
+          <div
+            style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}
+            className={classes['sidebar-content']}
+          >
+            <Typography
+              variant='h5'
+              component='h3'
+              display='flex'
+              width='100%'
+              alignItems='center'
+              justifyContent='center'
+              marginBottom='5rem'
+            >
+              Jbeil Apiary
+            </Typography>
+
+            <Card
+              onClick={() =>
+                onMarkerClick(Object.entries(user?.beeHives || {})[0][1])
+              }
+              sx={{
+                backgroundColor: 'var(--color-background-110)',
+                margin: '0.25rem',
+                height: 'min-content',
+              }}
+            >
+              <CardActionArea sx={{ padding: '0.5rem !important' }}>
+                <Typography
+                  sx={{
+                    color: 'var(--color-text)',
+                    justifyContent: 'center',
+                    display: 'flex',
+                  }}
+                >
+                  BeeHive Alpha
+                </Typography>
+              </CardActionArea>
+            </Card>
+            <Card
+              onClick={() =>
+                onMarkerClick(Object.entries(user?.beeHives || {})[0][1])
+              }
+              sx={{
+                backgroundColor: 'var(--color-background-110)',
+                margin: '0.25rem',
+                height: 'min-content',
+              }}
+            >
+              <CardActionArea sx={{ padding: '0.5rem !important' }}>
+                <Typography
+                  sx={{
+                    color: 'var(--color-text)',
+                    justifyContent: 'center',
+                    display: 'flex',
+                  }}
+                >
+                  BeeHive Beta
+                </Typography>
+              </CardActionArea>
+            </Card>
+            <Card
+              onClick={() =>
+                onMarkerClick(Object.entries(user?.beeHives || {})[0][1])
+              }
+              sx={{
+                backgroundColor: 'var(--color-background-110)',
+                margin: '0.25rem',
+                height: 'min-content',
+              }}
+            >
+              <CardActionArea sx={{ padding: '0.5rem !important' }}>
+                <Typography
+                  sx={{
+                    color: 'var(--color-text)',
+                    justifyContent: 'center',
+                    display: 'flex',
+                  }}
+                >
+                  BeeHive Omega
+                </Typography>
+              </CardActionArea>
+            </Card>
+          </div>
+          <Button
+            sx={{
+              textTransform: 'none',
+              color: 'var(--color-primary) !important',
+            }}
+            variant='text'
+            color='primary'
+          >
+            Add New Bee Hive
+          </Button>
+        </>
+      </Sidebar>
+      {/* TO */}
       {user?.role === 'owner' && (
         <SpeedDial>
           {actions.map((action) => (

@@ -1,7 +1,7 @@
 :root {
-  --color-primary-80: hsl(46, 91%, 29%);
+  --color-primary-80: #8d6e07;
   --color-primary: #f0b90b;
-  --color-primary-120: hsl(46, 91%, 69%);
+  --color-primary-120: #f8d668;
 
   --color-warning: #ff3c00;
   --color-warning-faded: #ff3c0033;
