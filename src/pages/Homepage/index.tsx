@@ -319,7 +319,7 @@ const Homepage = () => {
 
             <Card
               onClick={() =>
-                onMarkerClick(Object.entries(user?.beeHives || {})[0][1])
+                onMarkerClick(Object.entries(user?.beeHives || {})[4][1])
               }
               sx={{
                 backgroundColor: 'var(--color-background-110)',
@@ -341,7 +341,7 @@ const Homepage = () => {
             </Card>
             <Card
               onClick={() =>
-                onMarkerClick(Object.entries(user?.beeHives || {})[0][1])
+                onMarkerClick(Object.entries(user?.beeHives || {})[4][1])
               }
               sx={{
                 backgroundColor: 'var(--color-background-110)',
@@ -363,7 +363,7 @@ const Homepage = () => {
             </Card>
             <Card
               onClick={() =>
-                onMarkerClick(Object.entries(user?.beeHives || {})[0][1])
+                onMarkerClick(Object.entries(user?.beeHives || {})[4][1])
               }
               sx={{
                 backgroundColor: 'var(--color-background-110)',
