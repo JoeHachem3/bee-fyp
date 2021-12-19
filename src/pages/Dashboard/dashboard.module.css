@@ -21,11 +21,22 @@
   justify-content: center;
 }
 
+.owner > div {
+  width: 100%;
+  margin: 0.5rem;
+}
+
 .employeesList {
   display: flex;
   flex-wrap: wrap;
   width: 100%;
-  gap: 1rem;
+  /* gap: 1rem; */
+}
+
+.employee {
+  background-color: var(--color-background-110) !important;
+  margin: 0.5rem;
+  width: calc(20% - 1rem) !important;
 }
 
 .deleted {
@@ -33,4 +44,29 @@
   display: flex;
   justify-content: center;
   padding-bottom: 6rem;
+  margin: 0.5rem;
+}
+
+@media (max-width: 1366px) {
+  .employee {
+    width: calc(25% - 1rem) !important;
+  }
+}
+
+@media (max-width: 1000px) {
+  .employee {
+    width: calc(33.33% - 1rem) !important;
+  }
+}
+
+@media (max-width: 780px) {
+  .employee {
+    width: calc(50% - 1rem) !important;
+  }
+}
+
+@media (max-width: 500px) {
+  .employee {
+    width: calc(100% - 1rem) !important;
+  }
 }

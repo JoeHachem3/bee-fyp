@@ -25,8 +25,10 @@ const Toolbar = (props: {
           component='div'
         >
           {props.additionalIcons &&
-            props.additionalIcons.map((icon) => (
-              <IconButton onClick={icon.onClick}>{icon.icon}</IconButton>
+            props.additionalIcons.map((icon, index) => (
+              <IconButton key={index} onClick={icon.onClick}>
+                {icon.icon}
+              </IconButton>
             ))}
           {props.logo && (
             <img

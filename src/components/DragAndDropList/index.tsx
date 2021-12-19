@@ -22,14 +22,10 @@ const DragAndDropList = (props: DragAndDropListModel) => {
             }}
             ref={dropProvided.innerRef}
           >
-            {props.beeHives?.map(
-              (beeHive, index) =>
-                beeHive && (
-                  <Draggable
-                    key={beeHive.id}
-                    draggableId={beeHive.id}
-                    index={index}
-                  >
+            {props.list?.map(
+              (item, index) =>
+                item && (
+                  <Draggable key={item.id} draggableId={item.id} index={index}>
                     {(dragProvided) => (
                       <Card
                         {...dragProvided.dragHandleProps}
@@ -43,7 +39,7 @@ const DragAndDropList = (props: DragAndDropListModel) => {
                       >
                         <CardContent sx={{ padding: '0.5rem !important' }}>
                           <Typography sx={{ color: 'var(--color-text)' }}>
-                            {beeHive.name}
+                            {item.name}
                           </Typography>
                         </CardContent>
                       </Card>

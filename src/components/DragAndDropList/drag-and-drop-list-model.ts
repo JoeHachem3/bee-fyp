@@ -1,11 +1,9 @@
-import { BeeHiveModel } from '../../database/models';
-
 interface DragAndDropListModel {
   listId: string;
   listType?: string;
   internalScroll?: boolean;
   isCombineEnabled?: boolean;
-  beeHives?: BeeHiveModel[];
+  list?: { id: string; name: string; [key: string]: any }[];
   direction?: 'vertical' | 'horizontal';
 }
 

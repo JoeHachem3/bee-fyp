@@ -15,9 +15,9 @@ import { DragDropContext } from 'react-beautiful-dnd';
 import DragAndDropList from '../../components/DragAndDropList';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppState } from '../../store/state';
-import { BeeHiveModel, EmployeeModel } from '../../database/models';
+import { ApiaryModel, EmployeeModel } from '../../database/models';
 import * as userActions from '../../store/user/actions';
-import { updateBeeHive, updateEmployee } from '../../database';
+import { updateApiary, updateEmployee } from '../../database';
 import moment from 'moment';
 
 const Dashboard = () => {
@@ -34,26 +34,26 @@ const Dashboard = () => {
   const [isAuthenticationCardOpen, setIsAuthenticationCardOpen] =
     useState<boolean>(false);
 
-  const [ownerBeeHives, setOwnerBeeHives] = useState<BeeHiveModel[]>([]);
-  const [deletedBeeHives, setDeletedBeeHives] = useState<BeeHiveModel[]>([]);
+  const [ownerApiaries, setOwnerApiaries] = useState<ApiaryModel[]>([]);
+  const [deletedApiaries, setDeletedApiaries] = useState<ApiaryModel[]>([]);
 
   useEffect(() => {
-    const beeHives = Object.entries(user?.beeHives || {}).map(
-      ([key, beeHive]) => beeHive,
+    const apiaries = Object.entries(user?.apiaries || {}).map(
+      ([key, apiary]) => apiary,
     );
 
-    const ownerBeeHives = beeHives.filter(
-      (beeHive) =>
-        !beeHive.deletedAt &&
+    const ownerApiaries = apiaries.filter(
+      (apiary) =>
+        !apiary.deletedAt &&
         !Object.entries(user.employees).find(([key, employee]) =>
-          employee.worksIn.includes(beeHive.id),
+          employee.worksIn.includes(apiary.id),
         ),
     );
 
-    const deletedBeeHives = beeHives.filter((beeHive) => beeHive.deletedAt);
+    const deletedApiaries = apiaries.filter((apiary) => apiary.deletedAt);
 
-    setOwnerBeeHives(ownerBeeHives);
-    setDeletedBeeHives(deletedBeeHives);
+    setOwnerApiaries(ownerApiaries);
+    setDeletedApiaries(deletedApiaries);
   }, [user]);
 
   const actions = [
@@ -81,26 +81,26 @@ const Dashboard = () => {
       return;
 
     if (source.droppableId === 'deleted') {
-      const beeHive = deletedBeeHives[source.index];
-      updateBeeHive(beeHive.ref, { deletedAt: '' });
+      const apiary = deletedApiaries[source.index];
+      updateApiary(apiary.ref, { deletedAt: '' });
 
       if (destination.droppableId !== user.email) {
         const employee = JSON.parse(
           JSON.stringify(user.employees[destination.droppableId]),
         ) as EmployeeModel;
-        const currentBeeHive = deletedBeeHives[source.index]?.id;
+        const currentApiary = deletedApiaries[source.index]?.id;
 
-        if (!currentBeeHive) return;
+        if (!currentApiary) return;
 
         const worksIn = [];
-        employee.worksIn.forEach((beeHive, index) => {
+        employee.worksIn.forEach((apiary, index) => {
           if (index === destination.index) {
-            worksIn.includes(currentBeeHive) || worksIn.push(currentBeeHive);
+            worksIn.includes(currentApiary) || worksIn.push(currentApiary);
           }
-          worksIn.includes(beeHive) || worksIn.push(beeHive);
+          worksIn.includes(apiary) || worksIn.push(apiary);
         });
         if (employee.worksIn.length <= destination.index)
-          worksIn.includes(currentBeeHive) || worksIn.push(currentBeeHive);
+          worksIn.includes(currentApiary) || worksIn.push(currentApiary);
 
         employee.worksIn = worksIn;
 
@@ -109,28 +109,28 @@ const Dashboard = () => {
       }
     } else if (destination.droppableId === 'deleted') {
       if (source.droppableId === user.email) {
-        const currentBeeHive = ownerBeeHives[source.index];
-        if (!currentBeeHive) return;
+        const currentApiary = ownerApiaries[source.index];
+        if (!currentApiary) return;
 
-        updateBeeHive(currentBeeHive.ref, {
+        updateApiary(currentApiary.ref, {
           deletedAt: moment().format('MM/DD/YYYY'),
         });
       } else {
         const employee = JSON.parse(
           JSON.stringify(user.employees[source.droppableId]),
         ) as EmployeeModel;
-        const currentBeeHive = user.beeHives[employee.worksIn[source.index]];
+        const currentApiary = user.apiaries[employee.worksIn[source.index]];
 
-        if (!currentBeeHive) return;
+        if (!currentApiary) return;
 
         const worksIn = employee.worksIn.filter(
-          (beeHive) => beeHive !== currentBeeHive.id,
+          (apiary) => apiary !== currentApiary.id,
         );
 
         employee.worksIn = worksIn;
 
         updateEmployee(employee.ref, { worksIn });
-        updateBeeHive(currentBeeHive.ref, {
+        updateApiary(currentApiary.ref, {
           deletedAt: moment().format('MM/DD/YYYY'),
         });
         setEmployees({ ...user.employees, [employee.email]: employee });
@@ -139,19 +139,19 @@ const Dashboard = () => {
       const employee = JSON.parse(
         JSON.stringify(user.employees[destination.droppableId]),
       ) as EmployeeModel;
-      const currentBeeHive = ownerBeeHives[source.index]?.id;
+      const currentApiary = ownerApiaries[source.index]?.id;
 
-      if (!currentBeeHive) return;
+      if (!currentApiary) return;
 
       const worksIn = [];
-      employee.worksIn.forEach((beeHive, index) => {
+      employee.worksIn.forEach((apiary, index) => {
         if (index === destination.index) {
-          worksIn.includes(currentBeeHive) || worksIn.push(currentBeeHive);
+          worksIn.includes(currentApiary) || worksIn.push(currentApiary);
         }
-        worksIn.includes(beeHive) || worksIn.push(beeHive);
+        worksIn.includes(apiary) || worksIn.push(apiary);
       });
       if (employee.worksIn.length <= destination.index)
-        worksIn.includes(currentBeeHive) || worksIn.push(currentBeeHive);
+        worksIn.includes(currentApiary) || worksIn.push(currentApiary);
 
       employee.worksIn = worksIn;
 
@@ -163,7 +163,7 @@ const Dashboard = () => {
       ) as EmployeeModel;
 
       const worksIn = employee.worksIn.filter(
-        (beeHive, index) => index !== source.index,
+        (apiary, index) => index !== source.index,
       );
 
       employee.worksIn = worksIn;
@@ -176,26 +176,26 @@ const Dashboard = () => {
       };
       const sourceEmployee = employees[source.droppableId];
       const destinationEmployee = employees[destination.droppableId];
-      const currentBeeHive = sourceEmployee.worksIn[source.index];
+      const currentApiary = sourceEmployee.worksIn[source.index];
       sourceEmployee.worksIn = employees[source.droppableId].worksIn.filter(
-        (beeHive) => beeHive !== currentBeeHive,
+        (apiary) => apiary !== currentApiary,
       );
 
-      const destinationBeeHives = [];
-      destinationEmployee.worksIn.forEach((beeHive, index) => {
+      const destinationApiaries = [];
+      destinationEmployee.worksIn.forEach((apiary, index) => {
         if (index === destination.index) {
-          destinationBeeHives.includes(currentBeeHive) ||
-            destinationBeeHives.push(currentBeeHive);
+          destinationApiaries.includes(currentApiary) ||
+            destinationApiaries.push(currentApiary);
         }
-        destinationBeeHives.includes(beeHive) ||
-          destinationBeeHives.push(beeHive);
+        destinationApiaries.includes(apiary) ||
+          destinationApiaries.push(apiary);
       });
 
       if (destinationEmployee.worksIn.length <= destination.index)
-        destinationBeeHives.includes(currentBeeHive) ||
-          destinationBeeHives.push(currentBeeHive);
+        destinationApiaries.includes(currentApiary) ||
+          destinationApiaries.push(currentApiary);
 
-      destinationEmployee.worksIn = destinationBeeHives;
+      destinationEmployee.worksIn = destinationApiaries;
       updateEmployee(sourceEmployee.ref, { worksIn: sourceEmployee.worksIn });
       updateEmployee(destinationEmployee.ref, {
         worksIn: destinationEmployee.worksIn,
@@ -210,7 +210,7 @@ const Dashboard = () => {
 
   return (
     <div className={classes.dashboard}>
-      {user?.beeHives && (
+      {user?.apiaries && (
         <DragDropContext
           onDragEnd={({ destination, source }) =>
             onDragEnd({ destination, source })
@@ -235,7 +235,7 @@ const Dashboard = () => {
                   direction='horizontal'
                   internalScroll
                   listId={user.email}
-                  beeHives={ownerBeeHives}
+                  list={ownerApiaries}
                 />
               </CardContent>
             </Card>
@@ -243,12 +243,7 @@ const Dashboard = () => {
 
           <div className={classes.employeesList}>
             {Object.entries(user.employees || {})?.map(([key, employee]) => (
-              <Card
-                key={key}
-                sx={{
-                  backgroundColor: 'var(--color-background-110)',
-                }}
-              >
+              <Card className={classes.employee} key={key}>
                 <CardContent
                   sx={{
                     height: '100%',
@@ -273,7 +268,7 @@ const Dashboard = () => {
                     internalScroll
                     key={key}
                     listId={key}
-                    beeHives={employee.worksIn.map((id) => user.beeHives[id])}
+                    list={employee.worksIn.map((id) => user.apiaries[id])}
                   />
                 </CardContent>
               </Card>
@@ -298,7 +293,7 @@ const Dashboard = () => {
                   direction='horizontal'
                   internalScroll
                   listId={'deleted'}
-                  beeHives={deletedBeeHives}
+                  list={deletedApiaries}
                 />
               </CardContent>
             </Card>

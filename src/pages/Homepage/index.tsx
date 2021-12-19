@@ -7,7 +7,7 @@ import DateRangePickerModel from '../../components/DateRangePicker/date-range-pi
 import Map from '../../components/Map';
 import WeatherCard from '../../components/WeatherCard';
 import WeatherModel from '../../components/WeatherCard/weather-card.model';
-import { BeeHiveModel } from '../../database/models';
+import { ApiaryModel, BeeHiveModel } from '../../database/models';
 
 import classes from './homepage.module.css';
 import { useSelector } from 'react-redux';
@@ -34,8 +34,9 @@ import {
   CardActionArea,
 } from '@mui/material';
 import SpeedDial from '../../components/SpeedDial';
-import BeeHiveCard from '../../components/BeeHiveCard';
+import ApiaryCard from '../../components/ApiaryCard';
 import Sidebar from '../../components/Sidebar';
+import BeeHiveCard from '../../components/BeeHiveCard';
 
 const Homepage = () => {
   const user = useSelector((state: AppState) => state.userReducer.user);
@@ -46,16 +47,17 @@ const Homepage = () => {
   const [weatherData, setWeatherData] = useState<WeatherModel>();
   const [isWeatherCardOpen, setIsWeatherCardOpen] = useState<boolean>(false);
   const [isRangePickerOpen, setIsRangePickerOpen] = useState<boolean>(false);
-  const [addBeeHiveMode, setAddBeeHiveMode] = useState<boolean>(false);
-  const [newBeeHiveLocation, setNewBeeHiveLocation] = useState<GeoPoint>();
-
-  const [tmp, setTmp] = useState<boolean>(false);
+  const [addApiaryMode, setApiaryMode] = useState<boolean>(false);
+  const [newApiaryLocation, setNewApiaryLocation] = useState<GeoPoint>();
+  const [openApiary, setOpenApiary] = useState<ApiaryModel>();
+  const [openBeeHive, setOpenBeeHive] = useState<BeeHiveModel>();
+  const [isBeeHiveCardOpen, setIsBeeHiveCardOpen] = useState<boolean>(false);
 
   const actions = [
     {
       icon: <Place />,
       name: 'Add Apiary',
-      onClick: () => setAddBeeHiveMode(user?.role === 'owner'),
+      onClick: () => setApiaryMode(user?.role === 'owner'),
     },
   ];
 
@@ -103,53 +105,126 @@ const Homepage = () => {
     setDateRangePickerData({ ...dateRangePickerData, ...range });
   };
 
-  const onMarkerClick = (hive: BeeHiveModel) => {
-    getData(hive);
-    setWeatherData({ location: hive.location, name: hive.name });
+  const onMarkerClick = (apiary: ApiaryModel) => {
+    setOpenApiary(apiary);
+    setWeatherData({ location: apiary.location, name: apiary.name });
   };
 
   const center = { lng: 0, lat: 0 };
-  if (user?.beeHives) {
-    const beeHives = Object.entries(user.beeHives || {}).filter(
-      ([key, hive]) => !hive.deletedAt,
+  if (user?.apiaries) {
+    const apiaries = Object.entries(user.apiaries || {}).filter(
+      ([key, apiary]) => !apiary.deletedAt,
     );
-    if (beeHives.length) {
-      beeHives.forEach(([key, hive]) => {
-        center.lng += hive.location.longitude;
-        center.lat += hive.location.latitude;
+    if (apiaries.length) {
+      apiaries.forEach(([key, apiary]) => {
+        center.lng += apiary.location.longitude;
+        center.lat += apiary.location.latitude;
       });
-      center.lng /= beeHives.length;
-      center.lat /= beeHives.length;
+      center.lng /= apiaries.length;
+      center.lat /= apiaries.length;
     }
   }
 
   return (
     <>
       <div
-        className={`${classes.map} ${addBeeHiveMode ? 'add-new-bee-hive' : ''}`}
+        className={`${classes.map} ${addApiaryMode ? 'add-new-apiary' : ''}`}
       >
         <Map
-          addNew={addBeeHiveMode}
-          onAddNew={(location) => setNewBeeHiveLocation(location)}
+          addNew={addApiaryMode}
+          onAddNew={(location) => setNewApiaryLocation(location)}
           center={new GeoPoint(center.lat, center.lng)}
           zoom={2}
-          markers={Object.entries(user?.beeHives || {})
-            ?.filter(([key, hive]) => !hive.deletedAt)
-            .map(([key, hive]) => {
+          markers={Object.entries(user?.apiaries || {})
+            ?.filter(([key, apiary]) => !apiary.deletedAt)
+            .map(([key, apiary]) => {
               return {
-                location: hive.location,
-                description: hive.description,
-                name: hive.name,
-                onClick: () => setTmp(true),
+                location: apiary.location,
+                description: apiary.description,
+                name: apiary.name,
+                onClick: () => onMarkerClick(apiary),
               };
             })}
         />
       </div>
+      {openApiary && (
+        <Sidebar
+          anchor='right'
+          open={!!openApiary}
+          onClose={() => setOpenApiary(undefined)}
+        >
+          <>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.5rem',
+              }}
+              className={classes['sidebar-content']}
+            >
+              <Typography
+                variant='h5'
+                component='h3'
+                display='flex'
+                width='100%'
+                alignItems='center'
+                justifyContent='center'
+                marginBottom='5rem'
+              >
+                {openApiary.name}
+              </Typography>
+              <div className={classes.beeHives}>
+                {openApiary.beeHives?.map((hive) => (
+                  <Card
+                    key={hive.id}
+                    sx={{
+                      backgroundColor: 'var(--color-background-110)',
+                      margin: '0.25rem',
+                      height: 'min-content',
+                    }}
+                  >
+                    <CardActionArea
+                      sx={{ padding: '0.5rem !important' }}
+                      onClick={() => {
+                        getData(hive);
+                        setOpenBeeHive(hive);
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          color: 'var(--color-text)',
+                          justifyContent: 'center',
+                          display: 'flex',
+                        }}
+                      >
+                        {hive.name}
+                      </Typography>
+                    </CardActionArea>
+                  </Card>
+                ))}
+              </div>
+            </div>
+            {user?.role === 'owner' && (
+              <Button
+                onClick={() => setIsBeeHiveCardOpen(true)}
+                sx={{
+                  textTransform: 'none',
+                  color: 'var(--color-primary) !important',
+                }}
+                variant='text'
+                color='primary'
+              >
+                Add New Bee Hive
+              </Button>
+            )}
+          </>
+        </Sidebar>
+      )}
 
       <BottomDrawer
-        open={!!weatherData}
-        onClose={() => setWeatherData(undefined)}
-        title={weatherData?.name}
+        open={!!openBeeHive}
+        onClose={() => setOpenBeeHive(undefined)}
+        title={openApiary?.name}
         additionalIconButtons={
           graphData.data?.length
             ? [
@@ -277,126 +352,31 @@ const Homepage = () => {
       </BottomDrawer>
 
       <Dialog
-        open={!!newBeeHiveLocation}
+        open={!!newApiaryLocation}
         onClose={() => {
-          setNewBeeHiveLocation(undefined);
-          setAddBeeHiveMode(false);
+          setNewApiaryLocation(undefined);
+          setApiaryMode(false);
         }}
       >
-        <BeeHiveCard
-          location={newBeeHiveLocation}
+        <ApiaryCard
+          location={newApiaryLocation}
           afterSubmit={() => {
-            setNewBeeHiveLocation(undefined);
-            setAddBeeHiveMode(false);
+            setNewApiaryLocation(undefined);
+            setApiaryMode(false);
           }}
         />
       </Dialog>
 
-      {/* FROM */}
-
-      <Sidebar
-        anchor='right'
-        open={tmp}
-        onClose={() => setTmp(false)}
-        onOpen={() => setTmp(true)}
+      <Dialog
+        open={isBeeHiveCardOpen}
+        onClose={() => setIsBeeHiveCardOpen(false)}
       >
-        <>
-          <div
-            style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}
-            className={classes['sidebar-content']}
-          >
-            <Typography
-              variant='h5'
-              component='h3'
-              display='flex'
-              width='100%'
-              alignItems='center'
-              justifyContent='center'
-              marginBottom='5rem'
-            >
-              Jbeil Apiary
-            </Typography>
+        <BeeHiveCard
+          apiary={openApiary}
+          afterSubmit={() => setIsBeeHiveCardOpen(false)}
+        />
+      </Dialog>
 
-            <Card
-              onClick={() =>
-                onMarkerClick(Object.entries(user?.beeHives || {})[4][1])
-              }
-              sx={{
-                backgroundColor: 'var(--color-background-110)',
-                margin: '0.25rem',
-                height: 'min-content',
-              }}
-            >
-              <CardActionArea sx={{ padding: '0.5rem !important' }}>
-                <Typography
-                  sx={{
-                    color: 'var(--color-text)',
-                    justifyContent: 'center',
-                    display: 'flex',
-                  }}
-                >
-                  BeeHive Alpha
-                </Typography>
-              </CardActionArea>
-            </Card>
-            <Card
-              onClick={() =>
-                onMarkerClick(Object.entries(user?.beeHives || {})[4][1])
-              }
-              sx={{
-                backgroundColor: 'var(--color-background-110)',
-                margin: '0.25rem',
-                height: 'min-content',
-              }}
-            >
-              <CardActionArea sx={{ padding: '0.5rem !important' }}>
-                <Typography
-                  sx={{
-                    color: 'var(--color-text)',
-                    justifyContent: 'center',
-                    display: 'flex',
-                  }}
-                >
-                  BeeHive Beta
-                </Typography>
-              </CardActionArea>
-            </Card>
-            <Card
-              onClick={() =>
-                onMarkerClick(Object.entries(user?.beeHives || {})[4][1])
-              }
-              sx={{
-                backgroundColor: 'var(--color-background-110)',
-                margin: '0.25rem',
-                height: 'min-content',
-              }}
-            >
-              <CardActionArea sx={{ padding: '0.5rem !important' }}>
-                <Typography
-                  sx={{
-                    color: 'var(--color-text)',
-                    justifyContent: 'center',
-                    display: 'flex',
-                  }}
-                >
-                  BeeHive Omega
-                </Typography>
-              </CardActionArea>
-            </Card>
-          </div>
-          <Button
-            sx={{
-              textTransform: 'none',
-              color: 'var(--color-primary) !important',
-            }}
-            variant='text'
-            color='primary'
-          >
-            Add New Bee Hive
-          </Button>
-        </>
-      </Sidebar>
-      {/* TO */}
       {user?.role === 'owner' && (
         <SpeedDial>
           {actions.map((action) => (

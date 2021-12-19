@@ -1,4 +1,4 @@
-import classes from './bee-hive-card.module.css';
+import classes from './apiary-card.module.css';
 import {
   TextField,
   Card,
@@ -8,17 +8,20 @@ import {
 } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { isValueValid } from '../../utility/input-validation';
-import { useState } from 'react';
-import { initialBeeHiveForm } from './config';
-import { createBeeHive } from '../../database';
-import { ApiaryModel } from '../../database/models';
+import { useEffect, useState } from 'react';
+import { initialApiaryForm } from './config';
+import { useSelector } from 'react-redux';
+import { AppState } from '../../store/state';
+import { GeoPoint } from 'firebase/firestore';
+import { createApiary } from '../../database';
 
-const BeeHiveCard = (props: {
-  apiary: ApiaryModel;
+const ApiaryCard = (props: {
+  location?: GeoPoint;
   afterSubmit?: () => any;
 }) => {
-  const [beeHiveForm, setBeeHiveForm] =
-    useState<typeof initialBeeHiveForm>(initialBeeHiveForm);
+  const user = useSelector((state: AppState) => state.userReducer.user);
+  const [apiaryForm, setApiaryForm] =
+    useState<typeof initialApiaryForm>(initialApiaryForm);
 
   const [isValid, setIsValid] = useState<boolean>(false);
 
@@ -26,19 +29,37 @@ const BeeHiveCard = (props: {
 
   const [errorMessage, setErrorMessage] = useState<string>('');
 
+  useEffect(() => {
+    if (props.location) {
+      setApiaryForm({
+        ...apiaryForm,
+        latitude: {
+          ...apiaryForm.latitude,
+          value: props.location.latitude,
+          disabled: !!props.location.latitude,
+        },
+        longitude: {
+          ...apiaryForm.longitude,
+          value: props.location.longitude,
+          disabled: !!props.location.longitude,
+        },
+      });
+    }
+  }, [props, props.location]);
+
   const onInputChange = (event, key: string) => {
-    if (!beeHiveForm[key]) return;
-    const valid = beeHiveForm[key].noValidate
+    if (!apiaryForm[key]) return;
+    const valid = apiaryForm[key].noValidate
       ? true
-      : isValueValid(event.target.value, beeHiveForm[key].type);
+      : isValueValid(event.target.value, apiaryForm[key].type);
     let isValid = true;
-    Object.keys(beeHiveForm).forEach((k) => {
-      isValid = isValid && (k === key ? valid : beeHiveForm[k].valid);
+    Object.keys(apiaryForm).forEach((k) => {
+      isValid = isValid && (k === key ? valid : apiaryForm[k].valid);
     });
-    setBeeHiveForm({
-      ...beeHiveForm,
+    setApiaryForm({
+      ...apiaryForm,
       [key]: {
-        ...beeHiveForm[key],
+        ...apiaryForm[key],
         valid,
         value: event.target.value,
         touched: true,
@@ -53,11 +74,16 @@ const BeeHiveCard = (props: {
     setIsLoading(true);
 
     const credentials = {
-      name: beeHiveForm.name.value,
-      data: [],
+      name: apiaryForm.name.value,
+      description: apiaryForm.description.value,
+      owner: user.email,
+      location: new GeoPoint(
+        apiaryForm.latitude.value,
+        apiaryForm.longitude.value,
+      ),
     };
 
-    error = await createBeeHive(credentials, props.apiary);
+    error = await createApiary(credentials);
     setIsLoading(false);
 
     if (error) {
@@ -72,7 +98,7 @@ const BeeHiveCard = (props: {
         sx={{
           backgroundColor: 'var(--color-background-110)',
         }}
-        className={classes['bee-hive-card']}
+        className={classes['apiary-card']}
       >
         <CardContent
           sx={{
@@ -86,24 +112,24 @@ const BeeHiveCard = (props: {
               onSubmit(e);
             }}
           >
-            {Object.keys(beeHiveForm).map((key) => (
+            {Object.keys(apiaryForm).map((key) => (
               <TextField
                 className={classes['text-field']}
                 fullWidth
                 focused
                 key={key}
                 variant='filled'
-                type={beeHiveForm[key].type}
-                label={beeHiveForm[key].label}
-                placeholder={beeHiveForm[key].placeholder}
-                value={beeHiveForm[key].value}
+                type={apiaryForm[key].type}
+                label={apiaryForm[key].label}
+                placeholder={apiaryForm[key].placeholder}
+                value={apiaryForm[key].value}
                 color={
-                  beeHiveForm[key].valid || !beeHiveForm[key].touched
+                  apiaryForm[key].valid || !apiaryForm[key].touched
                     ? 'primary'
                     : 'warning'
                 }
-                disabled={beeHiveForm[key].disabled}
-                multiline={beeHiveForm[key].multiline}
+                disabled={apiaryForm[key].disabled}
+                multiline={apiaryForm[key].multiline}
                 onChange={(e) => onInputChange(e, key)}
               />
             ))}
@@ -142,4 +168,4 @@ const BeeHiveCard = (props: {
   );
 };
 
-export default BeeHiveCard;
+export default ApiaryCard;

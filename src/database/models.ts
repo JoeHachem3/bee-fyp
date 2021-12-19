@@ -32,7 +32,7 @@ export interface UserModel {
   lastName: string;
   role: UserRole;
   employees: { [key: string]: EmployeeModel };
-  beeHives: { [key: string]: BeeHiveModel };
+  apiaries: { [key: string]: ApiaryModel };
 }
 
 export class EmployeeModel {
@@ -57,35 +57,50 @@ export class EmployeeModel {
   }
 }
 
-export class FirebaseBeeHiveModel {
+export class FirebaseApiaryModel {
   id?: string;
   owner: string;
   name: string;
   location: GeoPoint;
-  data: BeeHiveDataModel[];
+  beeHives?: BeeHiveModel[];
   description?: string;
 
-  constructor(props: FirebaseBeeHiveModel) {
+  constructor(props: FirebaseApiaryModel) {
     return {
       id: uuidv4(),
       owner: props.owner,
       name: props.name,
       location: props.location,
-      data: props.data,
+      beeHives:
+        props.beeHives?.map((beeHive) => new BeeHiveModel(beeHive)) || [],
       description: props.description || '',
     };
   }
 }
 
-export interface BeeHiveModel {
+export interface ApiaryModel {
   ref: string;
   id: string;
   owner: string;
   name: string;
   location: GeoPoint;
-  data: BeeHiveDataModel[];
+  beeHives: BeeHiveModel[];
   description?: string;
   deletedAt?: string;
+}
+
+export class BeeHiveModel {
+  id?: string;
+  name: string;
+  data: BeeHiveDataModel[];
+
+  constructor(props: BeeHiveModel) {
+    return {
+      id: uuidv4(),
+      name: props.name,
+      data: props.data,
+    };
+  }
 }
 
 export interface BeeHiveDataModel {

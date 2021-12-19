@@ -1,4 +1,5 @@
 import {
+  ApiaryModel,
   BeeHiveModel,
   EmployeeModel,
   UserModel,
@@ -15,9 +16,9 @@ export interface logoutAction {
   type: string;
 }
 
-export interface setBeeHivesAction {
+export interface setApiariesAction {
   type: string;
-  beeHives: { [key: string]: BeeHiveModel };
+  apiaries: { [key: string]: ApiaryModel };
 }
 
 export interface setEmployeesAction {
@@ -39,12 +40,12 @@ export const logout = (): logoutAction => {
   };
 };
 
-export const setBeeHives = (beeHives: {
-  [key: string]: BeeHiveModel;
-}): setBeeHivesAction => {
+export const setApiaries = (apiaries: {
+  [key: string]: ApiaryModel;
+}): setApiariesAction => {
   return {
-    type: types.SET_BEE_HIVES,
-    beeHives,
+    type: types.SET_APIARIES,
+    apiaries,
   };
 };
 

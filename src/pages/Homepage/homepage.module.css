@@ -45,3 +45,11 @@
 .icons * {
   opacity: 1;
 }
+
+.beeHives {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 100%;
+  overflow: auto;
+}

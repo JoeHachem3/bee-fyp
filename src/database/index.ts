@@ -21,7 +21,7 @@ import db from './config';
 export const auth = getAuth();
 
 const usersCollection = collection(db, 'users');
-const beeHivesCollection = collection(db, 'bee-hives');
+const apiariesCollection = collection(db, 'apiaries');
 
 // Auth
 export async function login(credentials: { email: string; password: string }) {
@@ -52,7 +52,6 @@ export async function register(credentials: models.FirebaseUserModel) {
     const error = await createUser(credentials);
     return error;
   } catch (error) {
-    console.log(error);
     return error;
   }
 }
@@ -72,11 +71,10 @@ export async function getUserByEmail(email: string) {
 
   const user = users[0] as models.UserModel & models.EmployeeModel;
   if (user?.worksFor) {
-    const beeHives = await getBeeHivesByOwnerEmail(user.worksFor);
-    user.beeHives = {};
-    beeHives.forEach((beeHive) => {
-      if (user.worksIn.includes(beeHive.id))
-        user.beeHives[beeHive.id] = beeHive;
+    const apiaries = await getApiariesByOwnerEmail(user.worksFor);
+    user.apiaries = {};
+    apiaries.forEach((apiary) => {
+      if (user.worksIn.includes(apiary.id)) user.apiaries[apiary.id] = apiary;
     });
   }
 
@@ -123,45 +121,13 @@ export async function updateEmployee(
 }
 
 // BeeHives
-export function onBeeHivesChanged(ownerEmail: string) {
-  console.log('hey');
-  const q = query(beeHivesCollection, where('owner', '==', ownerEmail));
-  onSnapshot(q, (querySnapshot) => {
-    const beeHives = {};
-    querySnapshot.forEach((doc) => {
-      const beeHive = { ...doc.data(), ref: doc.id } as models.BeeHiveModel;
-      beeHives[beeHive.id] = beeHive;
-    });
-    store.dispatch(userActions.setBeeHives(beeHives));
-  });
-}
-
-export async function getBeeHiveById(id: string) {
-  const q = query(beeHivesCollection, where('id', '==', id));
-  const beeHivesSnapshot = await getDocs(q);
-  const beeHives = beeHivesSnapshot.docs.map((doc) => ({
-    ...doc.data(),
-    ref: doc.id,
-  }));
-  return beeHives;
-}
-
-export async function getBeeHivesByOwnerEmail(
-  ownerEmail: string,
-): Promise<models.BeeHiveModel[]> {
-  const q = query(beeHivesCollection, where('owner', '==', ownerEmail));
-  const usersSnapshot = await getDocs(q);
-  const beeHives = usersSnapshot.docs.map((doc) => ({
-    ...doc.data(),
-    ref: doc.id,
-  })) as any as models.BeeHiveModel[];
-  return beeHives;
-}
-
-export async function createBeeHive(beeHive: models.FirebaseBeeHiveModel) {
+export async function createBeeHive(
+  beeHive: models.BeeHiveModel,
+  apiary: models.ApiaryModel,
+) {
   try {
-    console.log(beeHive);
-    await addDoc(beeHivesCollection, new models.FirebaseBeeHiveModel(beeHive));
+    apiary.beeHives.push(new models.BeeHiveModel(beeHive));
+    updateDoc(doc(db, 'apiaries', apiary.ref), { beeHives: apiary.beeHives });
   } catch (e) {
     console.error('Error adding document: ', e);
     return e;
@@ -169,8 +135,66 @@ export async function createBeeHive(beeHive: models.FirebaseBeeHiveModel) {
 }
 
 export async function updateBeeHive(
-  ref: string,
+  apiary: models.ApiaryModel,
+  id: string,
   credentials: models.Optional<models.BeeHiveModel>,
 ) {
-  updateDoc(doc(db, 'bee-hives', ref), credentials);
+  apiary.beeHives.forEach((beeHive) => {
+    if (beeHive.id === id) {
+      beeHive = { ...beeHive, ...credentials };
+    }
+  });
+  updateDoc(doc(db, 'apiaries', apiary.ref), { beeHives: apiary.beeHives });
+}
+
+// Apiaries
+export function onApiariesChanged(ownerEmail: string) {
+  const q = query(apiariesCollection, where('owner', '==', ownerEmail));
+  onSnapshot(q, (querySnapshot) => {
+    const apiaries = {};
+    querySnapshot.forEach(async (doc) => {
+      const apiary = { ...doc.data(), ref: doc.id } as models.ApiaryModel;
+      apiaries[apiary.id] = apiary;
+    });
+
+    store.dispatch(userActions.setApiaries(apiaries));
+  });
+}
+
+export async function getApiaryById(id: string) {
+  const q = query(apiariesCollection, where('id', '==', id));
+  const apiariesSnapshot = await getDocs(q);
+  const apiaries = apiariesSnapshot.docs.map((doc) => ({
+    ...doc.data(),
+    ref: doc.id,
+  }));
+  return apiaries;
+}
+
+export async function getApiariesByOwnerEmail(
+  ownerEmail: string,
+): Promise<models.ApiaryModel[]> {
+  const q = query(apiariesCollection, where('owner', '==', ownerEmail));
+  const usersSnapshot = await getDocs(q);
+  const apiaries = usersSnapshot.docs.map((doc) => ({
+    ...doc.data(),
+    ref: doc.id,
+  })) as any as models.ApiaryModel[];
+  return apiaries;
+}
+
+export async function createApiary(apiary: models.FirebaseApiaryModel) {
+  try {
+    await addDoc(apiariesCollection, new models.FirebaseApiaryModel(apiary));
+  } catch (e) {
+    console.error('Error adding document: ', e);
+    return e;
+  }
+}
+
+export async function updateApiary(
+  ref: string,
+  credentials: models.Optional<models.ApiaryModel>,
+) {
+  updateDoc(doc(db, 'apiaries', ref), credentials);
 }

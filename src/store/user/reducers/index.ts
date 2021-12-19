@@ -1,8 +1,8 @@
-import { onBeeHivesChanged, onEmployeesChanged } from '../../../database';
+import { onApiariesChanged, onEmployeesChanged } from '../../../database';
 import {
   loginAction,
   logoutAction,
-  setBeeHivesAction,
+  setApiariesAction,
   setEmployeesAction,
 } from '../actions';
 import * as types from '../actions/types';
@@ -13,7 +13,7 @@ const initialState: UserState = {};
 const login = (state: UserState, action: loginAction): UserState => {
   if (action.user.role === 'owner') {
     onEmployeesChanged(action.user.email);
-    onBeeHivesChanged(action.user.email);
+    onApiariesChanged(action.user.email);
   }
   return {
     ...state,
@@ -25,16 +25,13 @@ const logout = (state: UserState, action: logoutAction): UserState => {
   return {};
 };
 
-const setBeeHives = (
+const setApiaries = (
   state: UserState,
-  action: setBeeHivesAction,
+  action: setApiariesAction,
 ): UserState => {
   return {
     ...state,
-    user: {
-      ...state.user,
-      beeHives: action.beeHives,
-    },
+    user: { ...state.user, apiaries: action.apiaries },
   };
 };
 
@@ -57,8 +54,8 @@ const userReducer = (state = initialState, action: any) => {
       return login(state, action);
     case types.LOGOUT:
       return logout(state, action);
-    case types.SET_BEE_HIVES:
-      return setBeeHives(state, action);
+    case types.SET_APIARIES:
+      return setApiaries(state, action);
     case types.SET_EMPLOYEES:
       return setEmployees(state, action);
     default:
