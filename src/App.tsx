@@ -25,8 +25,7 @@ const App = () => {
     [dispatch],
   );
   const storeLogin = useCallback(
-    (user: UserModel, expirationTime: number) =>
-      dispatch(userActions.login(user, expirationTime)),
+    (user: UserModel) => dispatch(userActions.login(user)),
     [dispatch],
   );
 
@@ -43,9 +42,10 @@ const App = () => {
         storeLogout();
       } else {
         const user = (await getUserByEmail(userCredentials.email)) as UserModel;
-        storeLogin(user, userCredentials.stsTokenManager.expirationTime);
+        storeLogin(user);
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

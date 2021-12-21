@@ -45,6 +45,7 @@ const ApiaryCard = (props: {
         },
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props, props.location]);
 
   const onInputChange = (event, key: string) => {

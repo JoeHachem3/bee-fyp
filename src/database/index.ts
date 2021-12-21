@@ -32,18 +32,18 @@ export async function login(credentials: { email: string; password: string }) {
       credentials.password,
     );
   } catch (error) {
-    const user = await getUserByEmail(credentials.email);
-    if (user) {
-      try {
-        createUserWithEmailAndPassword(
+    try {
+      const user = await getUserByEmail(credentials.email);
+      if (user) {
+        await createUserWithEmailAndPassword(
           auth,
           credentials.email,
           credentials.password,
         );
-      } catch (error) {
-        return error;
-      }
-    } else return error;
+      } else return error;
+    } catch (e) {
+      return error;
+    }
   }
 }
 
@@ -74,7 +74,7 @@ export async function getUserByEmail(email: string) {
     const apiaries = await getApiariesByOwnerEmail(user.worksFor);
     user.apiaries = {};
     apiaries.forEach((apiary) => {
-      if (user.worksIn.includes(apiary.id)) user.apiaries[apiary.id] = apiary;
+      if (user.worksIn?.includes(apiary.id)) user.apiaries[apiary.id] = apiary;
     });
   }
 

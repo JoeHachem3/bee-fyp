@@ -1,6 +1,5 @@
 import {
   ApiaryModel,
-  BeeHiveModel,
   EmployeeModel,
   UserModel,
 } from '../../../database/models';
@@ -9,7 +8,6 @@ import * as types from './types';
 export interface loginAction {
   type: string;
   user: UserModel;
-  expirationTime: number;
 }
 
 export interface logoutAction {
@@ -26,11 +24,10 @@ export interface setEmployeesAction {
   employees: { [key: string]: EmployeeModel };
 }
 
-export const login = (user: UserModel, expirationTime: number): loginAction => {
+export const login = (user: UserModel): loginAction => {
   return {
     type: types.LOGIN,
     user,
-    expirationTime,
   };
 };
 

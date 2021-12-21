@@ -8,9 +8,7 @@ import {
 } from 'react-leaflet';
 import { Typography } from '@mui/material';
 import L from 'leaflet';
-import { useState } from 'react';
 import { GeoPoint } from 'firebase/firestore';
-import classes from './map.module.css';
 
 const Map = (props: MapModel) => {
   props = new MapModel(props);
